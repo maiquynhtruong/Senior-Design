@@ -5,8 +5,8 @@
 |3|	Analyze, clean, and structure dataset|30|	11/15 | 12/15|	50%|	50%|
 |4|	Research about Tensorflow|10|	10/26 | 11/5|	50%	| 50% |
 |5|	Learn how to use Tensorflow on Google Cloud Platform (GCP)|	10|	11/5 | 11/15|	50%|	50%|
-|6|	Develop Tensorflow regression models to predict stock prices |   |   |   |	50%|	50%|
-|7|	Train the Tensorflow models to work with historical data and daily data from APIs |	 |  |  |50%|50%|
+|6|	Develop Tensorflow regression models to predict stock prices | 5 | 11/15 | 11/20  |	50%|	50%|
+|7|	Train the Tensorflow models to work with historical data and daily data from APIs |	10 | 11/20 | 12/1 |50%|50%|
 |8|	Design UI for mobile according to Material Design principles|	20|	12/1 | 12/20|	75%|	25%|
 |9|	Create Android app prototype|	20|	12/1 | 12/20|	25%|	75%|
 |10|	Obtain data from GCP storage to mobile and display as graphs in the mobile app|	30|	12/20|	1/20|	50%|	50%|
