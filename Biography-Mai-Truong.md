@@ -1,7 +1,7 @@
 ## Professional Biography for Mai Truong
 I'm a senior in Computer Science at the University of Cincinnati. I have an interest in Android mobile application development, compiler theory, and operating system.
 ## Contact information
-- Email: truongmi@mail.uc.edu
+- Email: maitruong2801@gmail.com
 ## Co-op Work Experience
 
   - Android Software Intern at Atomic Robot from May 7th to August 17th, 2018.
