@@ -1,3 +1,4 @@
+# Followed tutorial at https://www.datacamp.com/community/tutorials/lstm-python-stock-market
 from pandas_datareader import data
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -14,11 +15,11 @@ print('Loaded data from the Kaggle repository')
 
 df = df.sort_values('Date')
 
-plt.figure(figsize = (18,9))
-plt.plot(range(df.shape[0]),(df['Low']+df['High'])/2.0)
-plt.xticks(range(0,df.shape[0],500),df['Date'].loc[::500],rotation=45)
-plt.xlabel('Date',fontsize=18)
-plt.ylabel('Mid Price',fontsize=18)
+# plt.figure(figsize = (18,9))
+# plt.plot(range(df.shape[0]),(df['Low']+df['High'])/2.0)
+# plt.xticks(range(0,df.shape[0],500),df['Date'].loc[::500],rotation=45)
+# plt.xlabel('Date',fontsize=18)
+# plt.ylabel('Mid Price',fontsize=18)
 # plt.show()
 
 # First calculate the mid prices from the highest and lowest
@@ -84,3 +85,12 @@ for pred_idx in range(window_size, N):
     std_avg_x.append(date)
 
 print('MSE error for standard averaging: %.5f'%(0.5*np.mean(mse_errors)))
+
+# plt.figure(figsize=(18,9))
+# plt.plot(range(df.shape[0]), all_mid_data, color='b', label='True')
+# plt.plot(range(window_size, N), std_avg_predictions, color='orange', label='Prediction')
+# # plt.xticks(range(0,df.shape[0],50),df['Date'].loc[::50],rotation=45)
+# plt.xlabel('Date')
+# plt.ylabel('Mid Price (High + Low)/2')
+# plt.legend(fontsize=18)
+# plt.show()
