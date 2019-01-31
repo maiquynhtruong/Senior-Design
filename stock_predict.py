@@ -67,6 +67,7 @@ all_mid_data = np.concatenate([train_data,test_data],axis=0)
 
 ############## I don't understand this part ####################
 
+################### Standard Average ###################
 # Predict future stock market prices as an average of the previously observed stock market prices within a fixed size window, say past 100 days
 window_size = 100
 N = train_data.size
@@ -89,8 +90,36 @@ print('MSE error for standard averaging: %.5f'%(0.5*np.mean(mse_errors)))
 # plt.figure(figsize=(18,9))
 # plt.plot(range(df.shape[0]), all_mid_data, color='b', label='True')
 # plt.plot(range(window_size, N), std_avg_predictions, color='orange', label='Prediction')
-# # plt.xticks(range(0,df.shape[0],50),df['Date'].loc[::50],rotation=45)
+# plt.xticks(range(0,df.shape[0],50),df['Date'].loc[::50],rotation=45)
 # plt.xlabel('Date')
 # plt.ylabel('Mid Price (High + Low)/2')
 # plt.legend(fontsize=18)
 # plt.show()
+
+################### Exponential Moving Average ###################
+
+run_avg_predictions = []
+run_avg_x = []
+mse_errors = []
+running_mean = 0.0 # Exponential Moving Average maintained over time
+run_avg_predictions.append(running_mean)
+
+# contribution of recent prediction to EMA. If recent value accounts for very small fraction, it allows to perserve
+# much older values saw early on
+decay = 0.5
+for pred_idx in range(1, N):
+    running_mean = decay*running_mean + (1-decay)*train_data[pred_idx-1]
+    run_avg_predictions.append(running_mean)
+    mse_errors.append((running_mean-train_data[pred_idx])**2)
+    run_avg_x.append(date)
+
+print('MSE error for EMA averaging: %.5f'%(0.5*np.mean(mse_errors)))
+
+plt.figure(figsize=(18,9))
+plt.plot(range(df.shape[0]), all_mid_data, color='b', label='True')
+plt.plot(range(0, N), run_avg_predictions, color='orange', label='Prediction')
+# plt.xticks(range(0,df.shape[0],50),df['Date'].loc[::50],rotation=45)
+plt.xlabel('Date')
+plt.ylabel('Mid Price (High + Low)/2')
+plt.legend(fontsize=18)
+plt.show()
