@@ -10,7 +10,7 @@ import numpy as np
 import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
 
-df = pd.read_csv(os.path.join('Stocks','hpq.us.txt'),delimiter=',',usecols=['Date','Open','High','Low','Close'])
+df = pd.read_csv(os.path.join('Stocks','aapl.us.txt'),delimiter=',',usecols=['Date','Open','High','Low','Close'])
 print('Loaded data from the Kaggle repository')
 
 df = df.sort_values('Date')
