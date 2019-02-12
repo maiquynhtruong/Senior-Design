@@ -43,6 +43,7 @@
             android:textSize="20sp"
             android:text="American Airlines"/>
         <TextView
+            android:id="@+id/stock_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintRight_toRightOf="parent"
