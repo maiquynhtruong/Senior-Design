@@ -10,7 +10,7 @@ import numpy as np
 import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
 
-df = pd.read_csv(os.path.join('Stocks','aapl.us.txt'),delimiter=',',usecols=['Date','Open','High','Low','Close'])
+df = pd.read_csv(os.path.join('Stocks','appf.us.txt'),delimiter=',',usecols=['Date','Open','High','Low','Close'])
 print('Loaded data from the Kaggle repository')
 
 df = df.sort_values('Date')
@@ -53,7 +53,6 @@ train_data = train_data.reshape(-1)
 test_data = scaler.transform(test_data).reshape(-1)
 
 
-############## I don't understand this part ####################
 # Now perform exponential moving average smoothing
 # So the data will have a smoother curve than the original ragged data
 EMA = 0.0
@@ -64,8 +63,6 @@ for ti in range(11000):
 
 # Used for visualization and test purposes
 all_mid_data = np.concatenate([train_data,test_data],axis=0)
-
-############## I don't understand this part ####################
 
 ################### Standard Average ###################
 # Predict future stock market prices as an average of the previously observed stock market prices within a fixed size window, say past 100 days
