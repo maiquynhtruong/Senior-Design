@@ -27,7 +27,8 @@ low_prices = df.loc[:,'Low'].as_matrix()
 mid_prices = (high_prices+low_prices)/2.0
 
 # Split training and test data. 11000 entries for train data
-train_test_split = int(len(mid_prices)*8/10) # 80 / 20 ratio for train and test
+data_len = len(mid_prices)
+train_test_split = int(data_len*8/10) # 80 / 20 ratio for train and test
 print('train_test_split= ', train_test_split)
 
 train_data = mid_prices[:train_test_split]
@@ -42,17 +43,12 @@ test_data = test_data.reshape(-1,1)
 num_windows = 10
 smoothing_window_size = int(train_test_split/num_windows)
 for di in range(0, train_test_split, smoothing_window_size):
-    # if train_data[di:di+smoothing_window_size,:].size > 0:
-        # print(train_data[di:di+smoothing_window_size,:].shape)
         # print('di=', di, '\nsmoothing_window_size=', smoothing_window_size, '\ndi+smoothing_window_size=', di+smoothing_window_size)
-        print(train_data[di:di+smoothing_window_size,:].shape)
         scaler.fit(train_data[di:di+smoothing_window_size,:])
         train_data[di:di+smoothing_window_size,:] = scaler.transform(train_data[di:di+smoothing_window_size,:])
 
 # Normalize the last bit of remaining data
-# print('\nLast bit of data')
 # print('di=', di, '\nsmoothing_window_size=', smoothing_window_size, '\di+smoothing_window_size=', di+smoothing_window_size)
-# print(train_data[di+smoothing_window_size:,:].shape)
 if train_data[di+smoothing_window_size:,:].size > 0:
     scaler.fit(train_data[di+smoothing_window_size:,:])
     train_data[di+smoothing_window_size:,:] = scaler.transform(train_data[di+smoothing_window_size:,:])
@@ -328,7 +324,9 @@ data_gen = DataGeneratorSeq(train_data,batch_size,num_unrollings)
 x_axis_seq = []
 
 # Points you start our test predictions from
-test_points_seq = np.arange(train_test_split,12000,50).tolist()
+test_points_seq = np.arange(train_test_split, data_len,50).tolist()
+
+mse_seq = [] # MSE of each epoch
 
 for ep in range(epochs):
     print('Epoch {}'.format(ep))
@@ -390,18 +388,18 @@ for ep in range(epochs):
              # Make predictions for this many steps
              # Each prediction uses previous prediciton as it's current input
             for pred_i in range(n_predict_once):
+                if w_i + pred_i < data_len:
 
-                pred = session.run(sample_prediction,feed_dict=feed_dict)
+                    pred = session.run(sample_prediction,feed_dict=feed_dict)
 
-                our_predictions.append(np.asscalar(pred))
+                    our_predictions.append(np.asscalar(pred))
 
-                feed_dict[sample_inputs] = np.asarray(pred).reshape(-1,1)
+                    feed_dict[sample_inputs] = np.asarray(pred).reshape(-1,1)
 
-                if (ep+1)-valid_summary==0:
-                # Only calculate x_axis values in the first validation epoch
-                    x_axis.append(w_i+pred_i)
-
-                mse_test_loss += 0.5*(pred-all_mid_data[w_i+pred_i])**2
+                    if (ep+1)-valid_summary==0:
+                    # Only calculate x_axis values in the first validation epoch
+                        x_axis.append(w_i+pred_i)
+                    mse_test_loss += 0.5*(pred-all_mid_data[w_i+pred_i])**2
 
             session.run(reset_sample_states)
 
@@ -427,11 +425,14 @@ for ep in range(epochs):
             print('\tDecreasing learning rate by 0.5')
 
         test_mse_ot.append(current_test_mse)
-        print('\tTest MSE: %.5f'%np.mean(mse_test_loss_seq))
+        local_mse = np.mean(mse_test_loss_seq)
+        mse_seq.append(local_mse)
+        print('\tTest MSE: %.5f'%local_mse)
         predictions_over_time.append(predictions_seq)
         print('\tFinished Predictions')
 
-best_prediction_epoch = 28 # replace this with the epoch that you got the best results when running the plotting code
+best_prediction_epoch = mse_seq.index(min(mse_seq)) # replace this with the epoch that you got the best results when running the plotting code
+print('best_prediction_epoch=', best_prediction_epoch)
 
 plt.figure(figsize = (18,18))
 plt.subplot(2,1,1)
@@ -441,24 +442,25 @@ plt.plot(range(df.shape[0]),all_mid_data,color='b')
 # Plot older predictions with low alpha and newer predictions with high alpha
 start_alpha = 0.25
 alpha  = np.arange(start_alpha,1.1,(1.0-start_alpha)/len(predictions_over_time[::3]))
-for p_i,p in enumerate(predictions_over_time[::3]):
-    for xval,yval in zip(x_axis_seq,p):
-        plt.plot(xval,yval,color='r',alpha=alpha[p_i])
+
+for p_i, prediction in enumerate(predictions_over_time[::3]):
+    for xval, yval in zip(x_axis_seq, prediction):
+        plt.plot(xval, yval, color='r', alpha=alpha[p_i])
 
 plt.title('Evolution of Test Predictions Over Time',fontsize=18)
 plt.xlabel('Date',fontsize=18)
 plt.ylabel('Mid Price',fontsize=18)
-plt.xlim(train_test_split,12500)
+plt.xlim(train_test_split,data_len)
 
 plt.subplot(2,1,2)
 
 # Predicting the best test prediction you got
 plt.plot(range(df.shape[0]),all_mid_data,color='b')
-for xval,yval in zip(x_axis_seq,predictions_over_time[best_prediction_epoch]):
+for xval, yval in zip(x_axis_seq, predictions_over_time[best_prediction_epoch]):
     plt.plot(xval,yval,color='r')
 
 plt.title('Best Test Predictions Over Time',fontsize=18)
 plt.xlabel('Date',fontsize=18)
 plt.ylabel('Mid Price',fontsize=18)
-plt.xlim(train_test_split,12500)
+plt.xlim(train_test_split,data_len)
 plt.show()
