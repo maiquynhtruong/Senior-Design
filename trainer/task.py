@@ -10,8 +10,7 @@ import numpy as np
 import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
 
-df = pd.read_csv(os.path.join('Data','appf.us.txt'),delimiter=',',usecols=['Date','Open','High','Low','Close'])
-print('Loaded data from the Kaggle repository')
+df = pd.read_csv(os.path.join('../Data','appf.us.txt'),delimiter=',',usecols=['Date','Open','High','Low','Close'])
 
 df = df.sort_values('Date')
 
@@ -28,23 +27,35 @@ low_prices = df.loc[:,'Low'].as_matrix()
 mid_prices = (high_prices+low_prices)/2.0
 
 # Split training and test data. 11000 entries for train data
-train_data = mid_prices[:11000]
-test_data = mid_prices[11000:]
+train_test_split = int(len(mid_prices)*8/10)
+print('train_test_split= ', train_test_split)
+
+train_data = mid_prices[:train_test_split]
+test_data = mid_prices[train_test_split:]
 
 # scale the data to be in 0 to 1 range
 scaler = MinMaxScaler()
-train_data = train_data.reshape(-1,1)
+train_data = train_data.reshape(-1,1) #1 column matrix
 test_data = test_data.reshape(-1,1)
 
 # Train the Scaler with training data and smooth data
-smoothing_window_size = 2500
-for di in range(1, 10000, smoothing_window_size):
-    scaler.fit(train_data[di:di+smoothing_window_size,:])
-    train_data[di:di+smoothing_window_size,:] = scaler.transform(train_data[di:di+smoothing_window_size,:])
+num_windows = 10
+smoothing_window_size = int(train_test_split/num_windows)
+for di in range(0, train_test_split, smoothing_window_size):
+    # if train_data[di:di+smoothing_window_size,:].size > 0:
+        # print(train_data[di:di+smoothing_window_size,:].shape)
+        # print('di=', di, '\nsmoothing_window_size=', smoothing_window_size, '\ndi+smoothing_window_size=', di+smoothing_window_size)
+        print(train_data[di:di+smoothing_window_size,:].shape)
+        scaler.fit(train_data[di:di+smoothing_window_size,:])
+        train_data[di:di+smoothing_window_size,:] = scaler.transform(train_data[di:di+smoothing_window_size,:])
 
 # Normalize the last bit of remaining data
-scaler.fit(train_data[di+smoothing_window_size:,:])
-train_data[di+smoothing_window_size:,:] = scaler.transform(train_data[di+smoothing_window_size:,:])
+# print('\nLast bit of data')
+# print('di=', di, '\nsmoothing_window_size=', smoothing_window_size, '\di+smoothing_window_size=', di+smoothing_window_size)
+# print(train_data[di+smoothing_window_size:,:].shape)
+if train_data[di+smoothing_window_size:,:].size > 0:
+    scaler.fit(train_data[di+smoothing_window_size:,:])
+    train_data[di+smoothing_window_size:,:] = scaler.transform(train_data[di+smoothing_window_size:,:])
 
 # Reshape both train and test data
 train_data = train_data.reshape(-1)
@@ -57,7 +68,7 @@ test_data = scaler.transform(test_data).reshape(-1)
 # So the data will have a smoother curve than the original ragged data
 EMA = 0.0
 gamma = 0.1
-for ti in range(11000):
+for ti in range(train_test_split):
   EMA = gamma*train_data[ti] + (1-gamma)*EMA
   train_data[ti] = EMA
 
@@ -317,7 +328,7 @@ data_gen = DataGeneratorSeq(train_data,batch_size,num_unrollings)
 x_axis_seq = []
 
 # Points you start our test predictions from
-test_points_seq = np.arange(11000,12000,50).tolist()
+test_points_seq = np.arange(train_test_split,12000,50).tolist()
 
 for ep in range(epochs):
     print('Epoch {}'.format(ep))
