@@ -27,7 +27,7 @@ low_prices = df.loc[:,'Low'].as_matrix()
 mid_prices = (high_prices+low_prices)/2.0
 
 # Split training and test data. 11000 entries for train data
-train_test_split = int(len(mid_prices)*8/10)
+train_test_split = int(len(mid_prices)*8/10) # 80 / 20 ratio for train and test
 print('train_test_split= ', train_test_split)
 
 train_data = mid_prices[:train_test_split]
@@ -186,7 +186,7 @@ for ui,(data,label) in enumerate(zip(u_data, u_labels)):
 
 D = 1 # Dimensionality of the input, i.e. stock price
 num_unrollings = 50 # How many contnuous time steps for a single optimization step
-batch_size = 500 # number of samples in a batch
+batch_size = int(train_data.size / 10) # number of samples in a batch
 num_nodes = [200, 200, 150] # number of hidden nodes in each layer
 n_layers = len(num_nodes) # number of layers
 dropout = 0.5 # dropout amount
