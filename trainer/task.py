@@ -1,7 +1,7 @@
 # Followed tutorial at https://www.datacamp.com/community/tutorials/lstm-python-stock-market
-from pandas_datareader import data
-import matplotlib as mpl
-import matplotlib.pyplot as plt
+# from pandas_datareader import data
+# import matplotlib as mpl
+# import matplotlib.pyplot as plt
 import pandas as pd
 import datetime as dt
 import urllib.request, json
@@ -10,7 +10,8 @@ import numpy as np
 import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
 
-df = pd.read_csv(os.path.join('../Data','appf.us.txt'),delimiter=',',usecols=['Date','Open','High','Low','Close'])
+# df = pd.read_csv(os.path.join('../Data','appf.us.txt'),delimiter=',',usecols=['Date','Open','High','Low','Close'])
+df = pd.read_csv(os.path.join('Data','appf.us.txt'),delimiter=',',usecols=['Date','Open','High','Low','Close'])
 
 df = df.sort_values('Date')
 
@@ -296,7 +297,7 @@ print('\tAll done')
 ## Running the LSTMs
 # train and predict stock price movements for several epochs and see whether the predictions get better or worse over time
 
-epochs = 10
+epochs = 2
 valid_summary = 1 # Interval you make test predictions
 
 n_predict_once = 50 # Number of steps you continously predict for
@@ -434,9 +435,9 @@ for ep in range(epochs):
 best_prediction_epoch = mse_seq.index(min(mse_seq)) # replace this with the epoch that you got the best results when running the plotting code
 print('best_prediction_epoch=', best_prediction_epoch)
 
-plt.figure(figsize = (18,18))
-plt.subplot(2,1,1)
-plt.plot(range(df.shape[0]),all_mid_data,color='b')
+# plt.figure(figsize = (18,18))
+# plt.subplot(2,1,1)
+# plt.plot(range(df.shape[0]),all_mid_data,color='b')
 
 # Plotting how the predictions change over time
 # Plot older predictions with low alpha and newer predictions with high alpha
@@ -447,20 +448,20 @@ for p_i, prediction in enumerate(predictions_over_time[::3]):
     for xval, yval in zip(x_axis_seq, prediction):
         plt.plot(xval, yval, color='r', alpha=alpha[p_i])
 
-plt.title('Evolution of Test Predictions Over Time',fontsize=18)
-plt.xlabel('Date',fontsize=18)
-plt.ylabel('Mid Price',fontsize=18)
-plt.xlim(train_test_split,data_len)
-
-plt.subplot(2,1,2)
+# plt.title('Evolution of Test Predictions Over Time',fontsize=18)
+# plt.xlabel('Date',fontsize=18)
+# plt.ylabel('Mid Price',fontsize=18)
+# plt.xlim(train_test_split,data_len)
+#
+# plt.subplot(2,1,2)
 
 # Predicting the best test prediction you got
-plt.plot(range(df.shape[0]),all_mid_data,color='b')
-for xval, yval in zip(x_axis_seq, predictions_over_time[best_prediction_epoch]):
-    plt.plot(xval,yval,color='r')
-
-plt.title('Best Test Predictions Over Time',fontsize=18)
-plt.xlabel('Date',fontsize=18)
-plt.ylabel('Mid Price',fontsize=18)
-plt.xlim(train_test_split,data_len)
-plt.show()
+# plt.plot(range(df.shape[0]),all_mid_data,color='b')
+# for xval, yval in zip(x_axis_seq, predictions_over_time[best_prediction_epoch]):
+#     plt.plot(xval,yval,color='r')
+#
+# plt.title('Best Test Predictions Over Time',fontsize=18)
+# plt.xlabel('Date',fontsize=18)
+# plt.ylabel('Mid Price',fontsize=18)
+# plt.xlim(train_test_split,data_len)
+# plt.show()
