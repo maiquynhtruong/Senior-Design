@@ -297,7 +297,7 @@ print('\tAll done')
 ## Running the LSTMs
 # train and predict stock price movements for several epochs and see whether the predictions get better or worse over time
 
-epochs = 2
+epochs = 10
 valid_summary = 1 # Interval you make test predictions
 
 n_predict_once = 50 # Number of steps you continously predict for
@@ -441,12 +441,12 @@ print('best_prediction_epoch=', best_prediction_epoch)
 
 # Plotting how the predictions change over time
 # Plot older predictions with low alpha and newer predictions with high alpha
-start_alpha = 0.25
-alpha  = np.arange(start_alpha,1.1,(1.0-start_alpha)/len(predictions_over_time[::3]))
-
-for p_i, prediction in enumerate(predictions_over_time[::3]):
-    for xval, yval in zip(x_axis_seq, prediction):
-        plt.plot(xval, yval, color='r', alpha=alpha[p_i])
+# start_alpha = 0.25
+# alpha  = np.arange(start_alpha,1.1,(1.0-start_alpha)/len(predictions_over_time[::3]))
+#
+# for p_i, prediction in enumerate(predictions_over_time[::3]):
+#     for xval, yval in zip(x_axis_seq, prediction):
+#         plt.plot(xval, yval, color='r', alpha=alpha[p_i])
 
 # plt.title('Evolution of Test Predictions Over Time',fontsize=18)
 # plt.xlabel('Date',fontsize=18)
