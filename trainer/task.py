@@ -1,7 +1,7 @@
 # Followed tutorial at https://www.datacamp.com/community/tutorials/lstm-python-stock-market
 # from pandas_datareader import data
-# import matplotlib as mpl
-# import matplotlib.pyplot as plt
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 import pandas as pd
 import datetime as dt
 import urllib.request, json
@@ -11,16 +11,9 @@ import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
 
 # df = pd.read_csv(os.path.join('../Data','appf.us.txt'),delimiter=',',usecols=['Date','Open','High','Low','Close'])
-df = pd.read_csv(os.path.join('Data','appf.us.txt'),delimiter=',',usecols=['Date','Open','High','Low','Close'])
+df = pd.read_csv(os.path.join('Data','cmu.us.txt'),delimiter=',',usecols=['Date','Open','High','Low','Close'])
 
 df = df.sort_values('Date')
-
-# plt.figure(figsize = (18,9))
-# plt.plot(range(df.shape[0]),(df['Low']+df['High'])/2.0)
-# plt.xticks(range(0,df.shape[0],500),df['Date'].loc[::500],rotation=45)
-# plt.xlabel('Date',fontsize=18)
-# plt.ylabel('Mid Price',fontsize=18)
-# plt.show()
 
 # First calculate the mid prices from the highest and lowest
 high_prices = df.loc[:,'High'].as_matrix()
@@ -71,63 +64,6 @@ for ti in range(train_test_split):
 
 # Used for visualization and test purposes
 all_mid_data = np.concatenate([train_data,test_data],axis=0)
-
-################### Standard Average ###################
-# Predict future stock market prices as an average of the previously observed stock market prices within a fixed size window, say past 100 days
-window_size = 100
-N = train_data.size
-std_avg_predictions = []
-std_avg_x = []
-mse_errors = []
-
-for pred_idx in range(window_size, N):
-    if pred_idx >= N:
-        date = dt.datetime.strptime(k, '%Y-%m-%d').date() + dt.timedelta(days=1)
-    else:
-        date = df.loc[pred_idx, 'Date']
-
-    std_avg_predictions.append(np.mean(train_data[pred_idx-window_size:pred_idx]))
-    mse_errors.append((std_avg_predictions[-1]-train_data[pred_idx])**2)
-    std_avg_x.append(date)
-
-print('MSE error for standard averaging: %.5f'%(0.5*np.mean(mse_errors)))
-
-# plt.figure(figsize=(18,9))
-# plt.plot(range(df.shape[0]), all_mid_data, color='b', label='True')
-# plt.plot(range(window_size, N), std_avg_predictions, color='orange', label='Prediction')
-# plt.xticks(range(0,df.shape[0],50),df['Date'].loc[::50],rotation=45)
-# plt.xlabel('Date')
-# plt.ylabel('Mid Price (High + Low)/2')
-# plt.legend(fontsize=18)
-# plt.show()
-
-################### Exponential Moving Average ###################
-
-run_avg_predictions = []
-run_avg_x = []
-mse_errors = []
-running_mean = 0.0 # Exponential Moving Average maintained over time
-run_avg_predictions.append(running_mean)
-
-# contribution of recent prediction to EMA. If recent value accounts for very small fraction, it allows to perserve
-# much older values saw early on
-decay = 0.5
-for pred_idx in range(1, N):
-    running_mean = decay*running_mean + (1-decay)*train_data[pred_idx-1]
-    run_avg_predictions.append(running_mean)
-    mse_errors.append((running_mean-train_data[pred_idx])**2)
-    run_avg_x.append(date)
-
-print('MSE error for EMA averaging: %.5f'%(0.5*np.mean(mse_errors)))
-
-# plt.figure(figsize=(18,9))
-# plt.plot(range(df.shape[0]), all_mid_data, color='b', label='True')
-# plt.plot(range(0, N), run_avg_predictions, color='orange', label='Prediction')
-# plt.xticks(range(0,df.shape[0],50),df['Date'].loc[::50],rotation=45)
-# plt.xlabel('Date')
-# plt.ylabel('Mid Price (High + Low)/2')
-# plt.legend(fontsize=18)
-# plt.show()
 
 ################### Stock prediction with LSTM ###################
 
@@ -433,35 +369,3 @@ for ep in range(epochs):
         print('\tFinished Predictions')
 
 best_prediction_epoch = mse_seq.index(min(mse_seq)) # replace this with the epoch that you got the best results when running the plotting code
-print('best_prediction_epoch=', best_prediction_epoch)
-
-# plt.figure(figsize = (18,18))
-# plt.subplot(2,1,1)
-# plt.plot(range(df.shape[0]),all_mid_data,color='b')
-
-# Plotting how the predictions change over time
-# Plot older predictions with low alpha and newer predictions with high alpha
-# start_alpha = 0.25
-# alpha  = np.arange(start_alpha,1.1,(1.0-start_alpha)/len(predictions_over_time[::3]))
-#
-# for p_i, prediction in enumerate(predictions_over_time[::3]):
-#     for xval, yval in zip(x_axis_seq, prediction):
-#         plt.plot(xval, yval, color='r', alpha=alpha[p_i])
-
-# plt.title('Evolution of Test Predictions Over Time',fontsize=18)
-# plt.xlabel('Date',fontsize=18)
-# plt.ylabel('Mid Price',fontsize=18)
-# plt.xlim(train_test_split,data_len)
-#
-# plt.subplot(2,1,2)
-
-# Predicting the best test prediction you got
-# plt.plot(range(df.shape[0]),all_mid_data,color='b')
-# for xval, yval in zip(x_axis_seq, predictions_over_time[best_prediction_epoch]):
-#     plt.plot(xval,yval,color='r')
-#
-# plt.title('Best Test Predictions Over Time',fontsize=18)
-# plt.xlabel('Date',fontsize=18)
-# plt.ylabel('Mid Price',fontsize=18)
-# plt.xlim(train_test_split,data_len)
-# plt.show()
