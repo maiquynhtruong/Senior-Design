@@ -51,12 +51,22 @@ def prepare_data(df):
 
     # Normalize test data
     test_data = scaler.transform(test_data).reshape(-1)
-    
+
     # Used for visualization and test purposes
     all_mid_data = np.concatenate([train_data,test_data],axis=0)
 
+    return train_data, test_data, all_mid_data
+
 ################### Stock prediction with LSTM ###################
-def lstm_predict(epochs=50):
+def lstm_predict(train_data, all_mid_data, epochs=50, num_samples=10):
+    """ Generates data, prepares hyperparameters and run the lstm training
+    Args:
+      num_epochs: (int) How many times through to read the data.
+      batch_size: (int) First dimension size of the Tensors returned by input_fn
+
+    Returns:
+      For now, index of least test loss
+    """
     class DataGeneratorSeq(object):
         def __init__(self, prices, batch_size, num_unroll):
             self._prices = prices
@@ -109,7 +119,7 @@ def lstm_predict(epochs=50):
 
     D = 1 # Dimensionality of the input, i.e. stock price
     num_unrollings = 50 # How many contnuous time steps for a single optimization step
-    batch_size = int(train_data.size / 10) # number of samples in a batch
+    batch_size = int(train_data.size / num_samples) # number of samples in a batch
     num_nodes = [200, 200, 150] # number of hidden nodes in each layer
     n_layers = len(num_nodes) # number of layers
     dropout = 0.5 # dropout amount
@@ -168,8 +178,7 @@ def lstm_predict(epochs=50):
 
     ## Loss calculation and optimizer
 
-    # When calculating the loss you need to be careful about the exact form, because you calculate
-    # loss of all the unrolled steps at the same time
+    # When calculating the loss you need to be careful about the exact form, because you calculate loss of all the unrolled steps at the same time
     # Therefore, take the mean error or each batch and get the sum of that over all the unrolled steps
     print('Defining training loss')
     loss = 0.0
@@ -194,7 +203,6 @@ def lstm_predict(epochs=50):
     gradients, v = zip(*optimizer.compute_gradients(loss))
     gradients, _ = tf.clip_by_global_norm(gradients, 5.0)
     optimizer = optimizer.apply_gradients(zip(gradients, v))
-    print('\tAll done')
 
     ## Prediction Related Calculations
     print('Defining prediction related to TF functions')
@@ -218,15 +226,12 @@ def lstm_predict(epochs=50):
     with tf.control_dependencies([tf.assign(sample_c[li], sample_state[li][0]) for li in range(n_layers)] +
                                  [tf.assign(sample_h[li], sample_state[li][1]) for li in range(n_layers)]):
         sample_prediction = tf.nn.xw_plus_b(tf.reshape(sample_outputs, [1,-1]), w, b)
-    print('\tAll done')
 
     ## Running the LSTMs
     # train and predict stock price movements for several epochs and see whether the predictions get better or worse over time
-
+    average_loss = 0
     valid_summary = 1 # Interval you make test predictions
-
     n_predict_once = 50 # Number of steps you continously predict for
-
     train_seq_length = train_data.size # Full length of the training data
 
     train_mse_ot = [] # Accumulate Train losses
@@ -241,15 +246,13 @@ def lstm_predict(epochs=50):
     loss_nondecrease_count = 0
     loss_nondecrease_threshold = 2 # If the test error hasn't increased in this many steps, decrease learning rate
 
-    average_loss = 0
-
     # Define data generator
-    data_gen = DataGeneratorSeq(train_data,batch_size,num_unrollings)
+    data_gen = DataGeneratorSeq(train_data, batch_size, num_unrollings)
 
     x_axis_seq = []
 
     # Points you start our test predictions from
-    test_points_seq = np.arange(train_test_split, data_len,50).tolist()
+    test_points_seq = np.arange(train_data.size, all_mid_data.size, 50).tolist()
 
     mse_seq = [] # MSE of each epoch
 
@@ -293,7 +296,7 @@ def lstm_predict(epochs=50):
                 mse_test_loss = 0.0
                 our_predictions = []
 
-                if (ep+1)-valid_summary==0:
+                if (ep+1)-valid_summary == 0:
                   # Only calculate x_axis values in the first validation epoch
                   x_axis=[]
 
@@ -313,7 +316,7 @@ def lstm_predict(epochs=50):
                  # Make predictions for this many steps
                  # Each prediction uses previous prediciton as it's current input
                 for pred_i in range(n_predict_once):
-                    if w_i + pred_i < data_len:
+                    if w_i + pred_i < all_mid_data.size:
 
                         pred = session.run(sample_prediction,feed_dict=feed_dict)
 
@@ -359,10 +362,8 @@ def lstm_predict(epochs=50):
     best_prediction_epoch = mse_seq.index(min(mse_seq)) # replace this with the epoch that you got the best results when running the plotting code
 
 def input_fn(filenames,
-             num_epochs=None,
              shuffle=True,
-             skip_header_lines=0,
-             batch_size=200):
+             skip_header_lines=0):
     """Generates features and labels for training or evaluation.
 
     This uses the input pipeline based approach using file name queue

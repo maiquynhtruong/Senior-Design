@@ -4,19 +4,17 @@ import os
 
 import tensorflow as tf
 
-# import trainer.model as model
-import model
+import trainer.model as model
+# import model
 
 def train_and_evaluate(args):
     """Run the training and evaluate using the high level API."""
     train_input = model.input_fn(
       args.train_files,
-      num_epochs=args.num_epochs,
-      batch_size=args.train_batch_size
     )
 
-    model.prepare_data(train_input)
-    model.lstm_predict(args.num_epochs)
+    train_data, test_data, all_mid_data = model.prepare_data(train_input)
+    model.lstm_predict(train_data, all_mid_data, epochs=args.num_epochs, num_samples=args.num_samples)
 
 
 if __name__ == '__main__':
@@ -45,12 +43,17 @@ if __name__ == '__main__':
       whichever occurs first. If unspecified will run for --max-steps.\
       """,
       type=int,
-  )
+      default=50)
   parser.add_argument(
       '--train-batch-size',
       help='Batch size for training steps',
       type=int,
       default=40)
+  parser.add_argument(
+      '--num-samples',
+      help='Number of samples to calculate the batch size based on the size of input',
+      type=int,
+      default=10)
   parser.add_argument(
       '--eval-batch-size',
       help='Batch size for evaluation steps',
