@@ -9,8 +9,6 @@ import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.python.lib.io import file_io
 
-# df = pd.read_csv(os.path.join('../Data','appf.us.txt'),delimiter=',',usecols=['Date','Open','High','Low','Close'])
-
 def prepare_data(df):
     # First calculate the mid prices from the highest and lowest
     print('type of df is:', type(df))
@@ -364,20 +362,11 @@ def lstm_predict(train_data, all_mid_data, epochs=50, num_samples=10):
 
     best_prediction_epoch = mse_seq.index(min(mse_seq)) # replace this with the epoch that you got the best results when running the plotting code
 
-# def _decode_csv(line):
-    """Takes the string input tensor and returns a dict of rank-2 tensors."""
-    CSV_COLUMN_DEFAULTS = [[''], [0], [0], [0], [0]]
-    CSV_COLUMNS = ['Date','Open','High','Low','Close']
-    columns = tf.decode_csv(line, record_defaults=CSV_COLUMN_DEFAULTS)
-    print('columns=', columns)
-    return columns
-
 def input_fn(filenames):
     input_file = filenames[0] # filenames is a list so extract out the string
-    # dataset = tf.data.TextLineDataset(filenames).map(_decode_csv)
     # df = pd.read_csv(os.path.join('Data','cmu.us.txt'),delimiter=',',usecols=['Date','Open','High','Low','Close'])
 
-    with file_io.FileIO(input_file + "/train.csv", mode ='r') as file:
+    with file_io.FileIO(input_file, mode ='r') as file:
         dataframe = pd.read_csv(file, delimiter=',', usecols=['Date','Open','High','Low','Close'])
-    # dataframe = dataframe.sort_values('Date')
-    return dataset
+    dataframe = dataframe.sort_values('Date')
+    return dataframe
