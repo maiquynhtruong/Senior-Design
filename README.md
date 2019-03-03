@@ -35,8 +35,8 @@ The steps are very much based on Cloud ML Engine for Tensorflow [Getting Started
       ```
   - Set the `TRAIN_DATA` and `EVAL_DATA` variables to point to the files
     ```
-    TRAIN_DATA=gs://$BUCKET_NAME/Data/
-    EVAL_DATA=gs://$BUCKET_NAME/Data/
+    TRAIN_DATA=gs://$BUCKET_NAME/Data
+    EVAL_DATA=gs://$BUCKET_NAME/Data
     ```
   - Select the runtime version that supports the latest versions of the machine learning framework and other packages. To submit a training job with `Python 3.5`, set the Python version to `3.5` and the runtime version to `1.4` or greater. See the details of each version in the [Cloud ML Engine version list](https://cloud.google.com/ml-engine/docs/tensorflow/runtime-version-list) and [Specify Python version for a training job](https://cloud.google.com/ml-engine/docs/tensorflow/versioning#set-python-version-training)
     ```
@@ -102,13 +102,12 @@ The steps are very much based on Cloud ML Engine for Tensorflow [Getting Started
     --region $REGION \
     --runtime-version $RUNTIME_VERSION \
     -- \
-    --train-files $TRAIN_DATA \
-    --eval-files $EVAL_DATA \
-    --train-steps 1000 \
-    --eval-steps 100 \
-    --verbosity DEBUG
+    --train-files $TRAIN_DATA/aapl.us.txt \
+    --eval-files $EVAL_DATA/aapl.us.txt \
+    --num-epochs 10
+    --num-samples 10
     ```
-`verbosity` can be omitted.
+    See `task.py` for all the command-line arguments.
 
   Monitor the progress of the training job by watching the command-line output or in **ML Engine > Jobs** on [Google Cloud Platform Console](https://console.cloud.google.com/mlengine/jobs?). More details in [Monitor Training page](https://cloud.google.com/ml-engine/docs/tensorflow/monitor-training).
 
