@@ -1,7 +1,5 @@
 # Followed tutorial at https://www.datacamp.com/community/tutorials/lstm-python-stock-market
 # from pandas_datareader import data
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 import pandas as pd
 import datetime as dt
 import urllib.request, json
@@ -9,6 +7,7 @@ import os
 import numpy as np
 import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
+from tensorflow.python.lib.io import file_io
 
 # df = pd.read_csv(os.path.join('../Data','appf.us.txt'),delimiter=',',usecols=['Date','Open','High','Low','Close'])
 
@@ -241,6 +240,7 @@ def lstm_predict(train_data, all_mid_data, epochs=50, num_samples=10):
     session = tf.InteractiveSession()
 
     tf.global_variables_initializer().run()
+    saver = tf.train.Saver()
 
     # Used for decaying learning rate
     loss_nondecrease_count = 0
@@ -359,34 +359,25 @@ def lstm_predict(train_data, all_mid_data, epochs=50, num_samples=10):
             predictions_over_time.append(predictions_seq)
             print('\tFinished Predictions')
 
+    # save_path = saver.save(sess, "/output/model.ckpt")
+    # print("Model saved in path: %s" % save_path)
+
     best_prediction_epoch = mse_seq.index(min(mse_seq)) # replace this with the epoch that you got the best results when running the plotting code
 
-def input_fn(filenames,
-             shuffle=True,
-             skip_header_lines=0):
-    """Generates features and labels for training or evaluation.
+# def _decode_csv(line):
+    """Takes the string input tensor and returns a dict of rank-2 tensors."""
+    CSV_COLUMN_DEFAULTS = [[''], [0], [0], [0], [0]]
+    CSV_COLUMNS = ['Date','Open','High','Low','Close']
+    columns = tf.decode_csv(line, record_defaults=CSV_COLUMN_DEFAULTS)
+    print('columns=', columns)
+    return columns
 
-    This uses the input pipeline based approach using file name queue
-    to read data so that entire data is not loaded in memory.
-
-    Args:
-      filenames: [str] A List of CSV file(s) to read data from.
-      num_epochs: (int) How many times through to read the data. If None will
-        loop through data indefinitely
-      shuffle: (bool), whether or not to randomize the order of data. Controls
-        randomization of both file order and line order within files.
-      skip_header_lines: (int) set to non-zero in order to skip header lines in
-        CSV files.
-      batch_size: (int) First dimension size of the Tensors returned by input_fn
-
-    Returns:
-      A (features, indices) tuple where features is a dictionary of
-        Tensors, and indices is a single Tensor of label indices.
-    """
-    # dataset = tf.data.TextLineDataset(filenames).skip(skip_header_lines).map(_decode_csv)
+def input_fn(filenames):
+    input_file = filenames[0] # filenames is a list so extract out the string
+    # dataset = tf.data.TextLineDataset(filenames).map(_decode_csv)
     # df = pd.read_csv(os.path.join('Data','cmu.us.txt'),delimiter=',',usecols=['Date','Open','High','Low','Close'])
 
-    input_file = filenames[0] # filenames is a list so extract out the string
-    dataframe = pd.read_csv(input_file, delimiter=',', usecols=['Date','Open','High','Low','Close'])
-    dataframe = dataframe.sort_values('Date')
-    return dataframe
+    with file_io.FileIO(input_file + "/train.csv", mode ='r') as file:
+        dataframe = pd.read_csv(file, delimiter=',', usecols=['Date','Open','High','Low','Close'])
+    # dataframe = dataframe.sort_values('Date')
+    return dataset
