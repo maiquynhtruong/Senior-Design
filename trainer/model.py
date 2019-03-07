@@ -3,7 +3,7 @@
 import pandas as pd
 import datetime as dt
 import urllib.request, json
-import os
+import os, time
 import numpy as np
 import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
@@ -55,7 +55,7 @@ def prepare_data(df):
     return train_data, test_data, all_mid_data
 
 ################### Stock prediction with LSTM ###################
-def lstm_predict(train_data, all_mid_data, epochs=50, num_samples=10):
+def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
     """ Generates data, prepares hyperparameters and run the lstm training
     Args:
       num_epochs: (int) How many times through to read the data.
@@ -215,10 +215,8 @@ def lstm_predict(train_data, all_mid_data, epochs=50, num_samples=10):
     reset_sample_states = tf.group(*[tf.assign(sample_c[li], tf.zeros([1, num_nodes[li]])) for li in range(n_layers)],
                                    *[tf.assign(sample_h[li], tf.zeros([1, num_nodes[li]])) for li in range(n_layers)])
 
-    sample_outputs, sample_state = tf.nn.dynamic_rnn(multi_cell, tf.expand_dims(sample_inputs, 0),
-                                                    initial_state=tuple(initial_sample_state),
-                                                    time_major=True,
-                                                    dtype=tf.float32)
+    sample_outputs, sample_state = tf.nn.dynamic_rnn(multi_cell, tf.expand_dims(sample_inputs, 0),initial_state=tuple(initial_sample_state),
+                                                    time_major=True, dtype=tf.float32)
 
     with tf.control_dependencies([tf.assign(sample_c[li], sample_state[li][0]) for li in range(n_layers)] +
                                  [tf.assign(sample_h[li], sample_state[li][1]) for li in range(n_layers)]):
@@ -236,9 +234,10 @@ def lstm_predict(train_data, all_mid_data, epochs=50, num_samples=10):
     predictions_over_time = [] # Accumulate predictions
 
     session = tf.InteractiveSession()
-
     tf.global_variables_initializer().run()
-    saver = tf.train.Saver()
+    export_dir = os.path.join('pred_output', time.strftime("%Y%m%d-%H%M%S"))
+    builder = tf.saved_model.builder.SavedModelBuilder(export_dir)
+    builder.add_meta_graph_and_variables(session, [tf.saved_model.tag_constants.TRAINING], strip_default_attrs=True)
 
     # Used for decaying learning rate
     loss_nondecrease_count = 0
@@ -248,10 +247,7 @@ def lstm_predict(train_data, all_mid_data, epochs=50, num_samples=10):
     data_gen = DataGeneratorSeq(train_data, batch_size, num_unrollings)
 
     x_axis_seq = []
-
-    # Points you start our test predictions from
-    test_points_seq = np.arange(train_data.size, all_mid_data.size, 50).tolist()
-
+    test_points_seq = np.arange(train_data.size, all_mid_data.size, 50).tolist() # Points you start our test predictions from
     mse_seq = [] # MSE of each epoch
 
     for ep in range(epochs):
@@ -277,16 +273,12 @@ def lstm_predict(train_data, all_mid_data, epochs=50, num_samples=10):
 
             average_loss = average_loss/(valid_summary*(train_seq_length//batch_size))
 
-            # The average loss
-            if (ep+1)%valid_summary==0:
-                print('Average loss at step %d: %f' % (ep+1, average_loss))
+            if (ep+1)%valid_summary==0: print('Average loss at step %d: %f' % (ep+1, average_loss)) # The average loss
 
             train_mse_ot.append(average_loss)
 
             average_loss = 0 # reset loss
-
             predictions_seq = []
-
             mse_test_loss_seq = []
 
           # ===================== Updating State and Making Predicitons ========================
@@ -294,12 +286,10 @@ def lstm_predict(train_data, all_mid_data, epochs=50, num_samples=10):
                 mse_test_loss = 0.0
                 our_predictions = []
 
-                if (ep+1)-valid_summary == 0:
-                  # Only calculate x_axis values in the first validation epoch
-                  x_axis=[]
+                # Only calculate x_axis values in the first validation epoch
+                if (ep+1)-valid_summary == 0: x_axis=[]
 
-                # Feed in the recent past behavior of stock prices
-                # to make predictions from that point onwards
+                # Feed in the recent past behavior of stock prices to make predictions from that point onwards
                 for tr_i in range(w_i-num_unrollings+1,w_i-1):
                     current_price = all_mid_data[tr_i]
                     feed_dict[sample_inputs] = np.array(current_price).reshape(1,1)
@@ -315,16 +305,12 @@ def lstm_predict(train_data, all_mid_data, epochs=50, num_samples=10):
                  # Each prediction uses previous prediciton as it's current input
                 for pred_i in range(n_predict_once):
                     if w_i + pred_i < all_mid_data.size:
-
                         pred = session.run(sample_prediction,feed_dict=feed_dict)
-
                         our_predictions.append(np.asscalar(pred))
-
                         feed_dict[sample_inputs] = np.asarray(pred).reshape(-1,1)
 
-                        if (ep+1)-valid_summary==0:
                         # Only calculate x_axis values in the first validation epoch
-                            x_axis.append(w_i+pred_i)
+                        if (ep+1)-valid_summary==0: x_axis.append(w_i+pred_i)
                         mse_test_loss += 0.5*(pred-all_mid_data[w_i+pred_i])**2
 
                 session.run(reset_sample_states)
@@ -334,8 +320,7 @@ def lstm_predict(train_data, all_mid_data, epochs=50, num_samples=10):
                 mse_test_loss /= n_predict_once
                 mse_test_loss_seq.append(mse_test_loss)
 
-                if (ep+1)-valid_summary==0:
-                    x_axis_seq.append(x_axis)
+                if (ep+1)-valid_summary==0: x_axis_seq.append(x_axis)
 
             current_test_mse = np.mean(mse_test_loss_seq)
 
@@ -357,8 +342,8 @@ def lstm_predict(train_data, all_mid_data, epochs=50, num_samples=10):
             predictions_over_time.append(predictions_seq)
             print('\tFinished Predictions')
 
-    # save_path = saver.save(sess, "/output/model.ckpt")
-    # print("Model saved in path: %s" % save_path)
+            builder.add_meta_graph([tf.saved_model.tag_constants.TRAINING], strip_default_attrs=True)
+            builder.save()
 
     best_prediction_epoch = mse_seq.index(min(mse_seq)) # replace this with the epoch that you got the best results when running the plotting code
 
