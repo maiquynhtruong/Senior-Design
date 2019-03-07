@@ -84,10 +84,10 @@ The steps are very much based on Cloud ML Engine for Tensorflow [Getting Started
     --package-path trainer/ \
     --job-dir $MODEL_DIR \
     -- \
-    --train-files $TRAIN_DATA \
-    --eval-files $EVAL_DATA \
-    --train-steps 1000 \
-    --eval-steps 100
+    --train-files $TRAIN_DATA/aapl.us.txt \
+    --eval-files $EVAL_DATA/aapl.us.txt \
+    --num-epochs 10 \
+    --num-samples 10
   ```
 
 
@@ -104,7 +104,7 @@ The steps are very much based on Cloud ML Engine for Tensorflow [Getting Started
     -- \
     --train-files $TRAIN_DATA/aapl.us.txt \
     --eval-files $EVAL_DATA/aapl.us.txt \
-    --num-epochs 10
+    --num-epochs 10 \
     --num-samples 10
     ```
     See `task.py` for all the command-line arguments.
