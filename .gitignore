@@ -1,4 +1,6 @@
-Stocks/
+Data/
 google-cloud-sdk/
 venv/
 venv2/
+cloudml-samples-master/
+pred_output/
