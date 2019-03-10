@@ -3,6 +3,10 @@ package com.example.martinruiz.myapplication.models;
 import java.io.Serializable;
 
 public class Stock implements Serializable {
+    String name;
+    Double price;
+    Double predictedPrice;
+
     public String getName() {
         return name;
     }
@@ -19,8 +23,10 @@ public class Stock implements Serializable {
         this.price = price;
     }
 
-    String name;
-    Double price;
-    Double predictedPrice;
+    public Double getPredictedPrice() { return predictedPrice; }
+
+    public void setPredictedPrice(Double predictedPrice) {
+        this.predictedPrice = predictedPrice;
+    }
 
 }
