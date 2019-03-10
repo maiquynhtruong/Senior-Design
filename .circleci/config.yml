@@ -31,18 +31,19 @@ jobs:
             --train-steps 20 \
             --eval-steps 10
 
-          name: "Run a training job on the cloud"
-          command:
-            gcloud ml-engine jobs submit training $JOB_NAME \
-            --staging-bucket $PACKAGE_STAGING_PATH \
-            --job-dir $OUTPUT_PATH  \
-            --package-path $TRAINER_PACKAGE_PATH \
-            --module-name $MAIN_TRAINER_MODULE \
-            --python-version $PYTHON_VERSION \
-            --region $REGION \
-            --runtime-version $RUNTIME_VERSION \
-            -- \
-            --train-files $TRAIN_DATA/aapl.us.txt \
-            --eval-files $EVAL_DATA/aapl.us.txt \
-            --num-epochs 10
-            --num-samples 10
+      # - run:˘
+          # name: "Run a training job on the cloud"
+          # command:
+          #   gcloud ml-engine jobs submit training $JOB_NAME \
+          #   --staging-bucket $PACKAGE_STAGING_PATH \
+          #   --job-dir $OUTPUT_PATH  \
+          #   --package-path $TRAINER_PACKAGE_PATH \
+          #   --module-name $MAIN_TRAINER_MODULE \
+          #   --python-version $PYTHON_VERSION \
+          #   --region $REGION \
+          #   --runtime-version $RUNTIME_VERSION \
+          #   -- \
+          #   --train-files $TRAIN_DATA/aapl.us.txt \
+          #   --eval-files $EVAL_DATA/aapl.us.txt \
+          #   --num-epochs 10
+          #   --num-samples 10
