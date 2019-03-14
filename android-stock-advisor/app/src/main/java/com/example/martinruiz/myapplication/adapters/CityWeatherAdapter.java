@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.martinruiz.myapplication.R;
-import com.example.martinruiz.myapplication.activities.MainActivity;
 import com.example.martinruiz.myapplication.interfaces.onSwipeListener;
 import com.example.martinruiz.myapplication.models.CityWeather;
 import com.example.martinruiz.myapplication.utils.IconProvider;
@@ -21,7 +20,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.internal.Util;
 
 /**
  * Created by MartinRuiz on 8/19/2017.

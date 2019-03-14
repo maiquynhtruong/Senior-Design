@@ -1,25 +1,15 @@
 package com.example.martinruiz.myapplication.splash;
 
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Handler;
-import android.support.annotation.MainThread;
 import android.support.annotation.RequiresApi;
-import android.support.annotation.UiThread;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.transition.Explode;
-import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.example.martinruiz.myapplication.R;
-import com.example.martinruiz.myapplication.activities.MainActivity;
 import com.mikhaellopez.circularfillableloaders.CircularFillableLoaders;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class SplashActivity extends AppCompatActivity {
 
