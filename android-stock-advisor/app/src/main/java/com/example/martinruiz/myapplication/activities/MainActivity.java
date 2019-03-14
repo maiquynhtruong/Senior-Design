@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         fabAddStock.setOnClickListener(view -> {
-            showAddStockAlert("Add city","Type the city you want to add");
+            showAddStockAlert("Add Company","Type the company stock you want to add");
         });
 
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback((onSwipeListener) adapter);
