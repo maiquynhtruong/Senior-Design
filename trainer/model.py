@@ -112,7 +112,7 @@ def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
         print('\tInputs: ', data)
         print('\tOutputs: ', label)
 
-    ## Defining hyperparameters
+    """Defining hyperparameters"""
 
     D = 1 # Dimensionality of the input, i.e. stock price
     num_unrollings = 50 # How many contnuous time steps for a single optimization step
@@ -121,10 +121,10 @@ def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
     n_layers = len(num_nodes) # number of layers
     dropout = 0.5 # dropout amount
 
+    # tf.saved_model.loader.load(session, [tf.saved_model.tag_constants.SERVING], export_dir)
     tf.reset_default_graph()
 
-    ## Defining inputs and outputs
-
+    ''' Defining inputs and outputs'''
     train_inputs, train_outputs = [], []
 
     # Unroll the input over time defining placeholders for each time step
@@ -134,15 +134,10 @@ def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
 
     ## Defining parameters of the LSTM and the regression layers
 
-    lstm_cells = [tf.contrib.rnn.LSTMCell(num_units=num_nodes[li],
-                                        state_is_tuple=True,
-                                        initializer=tf.contrib.layers.xavier_initializer())
-        for li in range(n_layers)]
-    drop_lstm_cells = [tf.contrib.rnn.DropoutWrapper(cell=lstm,
-                                                    input_keep_prob=1.0,
-                                                    output_keep_prob=1.0-dropout,
-                                                    state_keep_prob=1.0-dropout
-    ) for lstm in lstm_cells]
+    lstm_cells = [tf.contrib.rnn.LSTMCell(num_units=num_nodes[li], state_is_tuple=True,
+                initializer=tf.contrib.layers.xavier_initializer()) for li in range(n_layers)]
+    drop_lstm_cells = [tf.contrib.rnn.DropoutWrapper(cell=lstm, input_keep_prob=1.0, output_keep_prob=1.0-dropout,
+                         state_keep_prob=1.0-dropout) for lstm in lstm_cells]
 
     drop_multi_cell = tf.contrib.rnn.MultiRNNCell(drop_lstm_cells)
     multi_cell = tf.contrib.rnn.MultiRNNCell(lstm_cells)
@@ -150,9 +145,9 @@ def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
     w = tf.get_variable(name='w', shape=[num_nodes[-1],1], initializer=tf.contrib.layers.xavier_initializer())
     b = tf.get_variable(name='b', initializer=tf.random_uniform(shape=[1], minval=-0.1, maxval=0.1))
 
-    ## Calculating LSTM output and Feeding it to the regression layer to get final prediction
+    '''Calculating LSTM output and Feeding it to the regression layer to get final prediction'''
 
-    c, h = [], [] # # cell state and hidden state variables to maintain the state of the LSTM
+    c, h = [], [] # cell state and hidden state variables to maintain the state of the LSTM
     initial_state = []
     for li in range(n_layers):
         c.append(tf.Variable(tf.zeros([batch_size, num_nodes[li]]), trainable=False))
@@ -164,8 +159,7 @@ def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
     all_inputs = tf.concat([tf.expand_dims(t,0) for t in train_inputs], axis=0)
 
     # all_outputs is [seq_length, batch_size, num_nodes]
-    all_lstm_outputs, state = tf.nn.dynamic_rnn(drop_multi_cell, all_inputs,
-                                initial_state=tuple(initial_state),
+    all_lstm_outputs, state = tf.nn.dynamic_rnn(drop_multi_cell, all_inputs, initial_state=tuple(initial_state),
                                 time_major=True, dtype=tf.float32)
 
     all_lstm_outputs = tf.reshape(all_lstm_outputs, [batch_size*num_unrollings, num_nodes[-1]])
@@ -181,8 +175,7 @@ def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
     loss = 0.0
     with tf.control_dependencies([tf.assign(c[li], state[li][0]) for li in range(n_layers)]+
                                  [tf.assign(h[li], state[li][1]) for li in range(n_layers)]):
-        for ui in range(num_unrollings):
-            loss += tf.reduce_mean(0.5*(split_outputs[ui]-train_outputs[li])**2)
+        for ui in range(num_unrollings): loss += tf.reduce_mean(0.5*(split_outputs[ui]-train_outputs[li])**2)
 
     print('Learning rate decay operation')
     global_step = tf.Variable(0, trainable=False)
@@ -190,9 +183,8 @@ def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
     tf_learning_rate = tf.placeholder(shape=None, dtype=tf.float32)
     tf_min_learning_rate = tf.placeholder(shape=None, dtype=tf.float32)
 
-    learning_rate = tf.maximum(
-        tf.train.exponential_decay(tf_learning_rate, global_step, decay_steps=1, decay_rate=0.5, staircase=True), tf_min_learning_rate
-    )
+    learning_rate = tf.maximum(tf.train.exponential_decay(tf_learning_rate, global_step, decay_steps=1,
+                                decay_rate=0.5, staircase=True), tf_min_learning_rate)
 
     # Optimizer
     print('Tf optimizer operation')
@@ -235,9 +227,8 @@ def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
 
     session = tf.InteractiveSession()
     tf.global_variables_initializer().run()
-    export_dir = os.path.join('pred_output', time.strftime("%Y%m%d-%H%M%S"))
+    export_dir = os.path.join('pred_output', 'run_' + time.strftime("%Y%m%d-%H%M%S"))
     builder = tf.saved_model.builder.SavedModelBuilder(export_dir)
-    builder.add_meta_graph_and_variables(session, [tf.saved_model.tag_constants.TRAINING], strip_default_attrs=True)
 
     # Used for decaying learning rate
     loss_nondecrease_count = 0
@@ -254,27 +245,21 @@ def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
         print('Epoch {}'.format(ep))
         # ========================= Training =====================================
         for step in range(train_seq_length//batch_size):
-
             u_data, u_labels = data_gen.unroll_batches()
-
             feed_dict = {}
+
             for ui,(dat,lbl) in enumerate(zip(u_data,u_labels)):
                 feed_dict[train_inputs[ui]] = dat.reshape(-1,1)
                 feed_dict[train_outputs[ui]] = lbl.reshape(-1,1)
 
             feed_dict.update({tf_learning_rate: 0.0001, tf_min_learning_rate:0.000001})
-
             _, l = session.run([optimizer, loss], feed_dict=feed_dict)
-
             average_loss += l
 
          # ============================ Validation ==============================
         if (ep+1) % valid_summary == 0:
-
             average_loss = average_loss/(valid_summary*(train_seq_length//batch_size))
-
             if (ep+1)%valid_summary==0: print('Average loss at step %d: %f' % (ep+1, average_loss)) # The average loss
-
             train_mse_ot.append(average_loss)
 
             average_loss = 0 # reset loss
@@ -290,15 +275,12 @@ def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
                 if (ep+1)-valid_summary == 0: x_axis=[]
 
                 # Feed in the recent past behavior of stock prices to make predictions from that point onwards
-                for tr_i in range(w_i-num_unrollings+1,w_i-1):
+                for tr_i in range(w_i-num_unrollings+1, w_i-1):
                     current_price = all_mid_data[tr_i]
                     feed_dict[sample_inputs] = np.array(current_price).reshape(1,1)
-                    _ = session.run(sample_prediction,feed_dict=feed_dict)
-
+                    _ = session.run(sample_prediction, feed_dict=feed_dict)
                 feed_dict = {}
-
                 current_price = all_mid_data[w_i-1]
-
                 feed_dict[sample_inputs] = np.array(current_price).reshape(1,1)
 
                  # Make predictions for this many steps
@@ -310,12 +292,14 @@ def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
                         feed_dict[sample_inputs] = np.asarray(pred).reshape(-1,1)
 
                         # Only calculate x_axis values in the first validation epoch
-                        if (ep+1)-valid_summary==0: x_axis.append(w_i+pred_i)
-                        mse_test_loss += 0.5*(pred-all_mid_data[w_i+pred_i])**2
+                        if (ep+1)-valid_summary == 0: x_axis.append(w_i+pred_i)
+                        mse_test_loss += 0.5 * (pred - all_mid_data[w_i + pred_i]) ** 2
 
                 session.run(reset_sample_states)
 
                 predictions_seq.append(np.array(our_predictions))
+                print('w_i:', w_i)
+                print('\nour_predictions:', our_predictions)
 
                 mse_test_loss /= n_predict_once
                 mse_test_loss_seq.append(mse_test_loss)
@@ -340,12 +324,30 @@ def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
             mse_seq.append(local_mse)
             print('\tTest MSE: %.5f'%local_mse)
             predictions_over_time.append(predictions_seq)
-            print('\tFinished Predictions')
+            print('\tFinished Predictions:\n')#, predictions_seq)
 
-            builder.add_meta_graph([tf.saved_model.tag_constants.TRAINING], strip_default_attrs=True)
-            builder.save()
+    tensor_info_train_inputs = tf.saved_model.utils.build_tensor_info(train_inputs[1])
+    tensor_info_train_outputs = tf.saved_model.utils.build_tensor_info(train_outputs[1])
+
+    prediction_signature = (
+      tf.saved_model.signature_def_utils.build_signature_def(
+          inputs={'train_inputs': tensor_info_train_inputs},
+          outputs={'train_outputs': tensor_info_train_outputs},
+          method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME))
+
+      # builder.add_meta_graph_and_variables(session, [tf.saved_model.tag_constants.TRAINING], strip_default_attrs=True)
+    builder.add_meta_graph_and_variables(
+        session, [tf.saved_model.tag_constants.SERVING],
+        signature_def_map={
+            'predict_prices': prediction_signature
+        },
+        main_op=tf.tables_initializer(),
+        strip_default_attrs=True)
+
+    builder.save()
 
     best_prediction_epoch = mse_seq.index(min(mse_seq)) # replace this with the epoch that you got the best results when running the plotting code
+    print('best_prediction_epoch', predictions_over_time[best_prediction_epoch])
 
 def input_fn(filenames):
     input_file = filenames[0] # filenames is a list so extract out the string
