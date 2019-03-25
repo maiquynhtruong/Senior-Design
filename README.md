@@ -40,7 +40,7 @@ The steps are very much based on Cloud ML Engine for Tensorflow [Getting Started
     ```
   - Select the runtime version that supports the latest versions of the machine learning framework and other packages. To submit a training job with `Python 3.5`, set the Python version to `3.5` and the runtime version to `1.4` or greater. See the details of each version in the [Cloud ML Engine version list](https://cloud.google.com/ml-engine/docs/tensorflow/runtime-version-list) and [Specify Python version for a training job](https://cloud.google.com/ml-engine/docs/tensorflow/versioning#set-python-version-training)
     ```
-    RUNTIME_VERSION=1.4 # to get python3
+    RUNTIME_VERSION=1.13 # to get python3
     PYTHON_VERSION=3.5
     ```
 3. Set up environment variables
@@ -112,3 +112,59 @@ The steps are very much based on Cloud ML Engine for Tensorflow [Getting Started
   Monitor the progress of the training job by watching the command-line output or in **ML Engine > Jobs** on [Google Cloud Platform Console](https://console.cloud.google.com/mlengine/jobs?). More details in [Monitor Training page](https://cloud.google.com/ml-engine/docs/tensorflow/monitor-training).
 
 7. Next step is to deploy a model. There's a separate page about [deploying models](https://cloud.google.com/ml-engine/docs/tensorflow/deploying-models).
+
+8. Test prediction locally
+```
+gcloud ml-engine local predict \
+--model-dir $MODEL_DIR \
+--text-instances `path/to/training/file/aapl.us.txt`
+```
+9. A `saved_model` folder is created that save variables and execution graph each run.
+
+  - The following command shows all available `SignatureDef` keys in a `MetaGraphDef`:
+  ```
+  saved_model_cli show --dir /tmp/<saved_model_dir> --tag_set serve
+  ```
+  where `saved_model_dir` is the folder, for example: `run_20190322-121359`
+
+  - To show all available information in the `SavedModel`, run:
+  ```
+  saved_model_cli show \
+  --dir /pred_output/<saved_model_dir> \
+  --all
+  ```
+
+  - Invoke the `run` command to run a graph computation, passing inputs and then displaying (and optionally saving) the outputs. Here's the syntax:
+  ```
+  saved_model_cli run \
+  --dir pred_output/run_20190322-121359/ \
+  --tag_set serve \
+  --signature_def serving_default \
+  --inputs 'aapl='$TRAIN_DATA'/aapl.us.txt' \
+  --outdir /pred_output/output_dir
+  ```
+10. Test prediction locally by using [gcloud local prediction](https://cloud.google.com/sdk/gcloud/reference/ml-engine/local/predict)
+  - Set up a few variables:
+    ```
+    JSON_INSTANCES=pred_request_json/example1.json
+    MODEL=stock_advisor # Or some other name
+    SIGNATURE_NAME=DEFAULT_SERVING_SIGNATURE_DEF_KEY
+    VERSION=1.0.0
+    ```
+
+  ```
+  gcloud ml-engine local predict \
+  --model-dir $MODEL_DIR \
+  --json-instances $JSON_INSTANCES
+  #--text-instances $TEXT_INSTANCES \ # Not sure which to choose
+  #--signature-name $SIGNATURE_NAME # Probably unnecessary
+  ```
+11. Make request to gcloud for [online prediction](https://cloud.google.com/sdk/gcloud/reference/ml-engine/predict)
+
+  ```
+  gcloud ml-engine predict \
+  --model $MODEL \
+  --json-instances $JSON_INSTANCES \
+  --signature-name $SIGNATURE_NAME 
+  # --version $VERSION
+  ```

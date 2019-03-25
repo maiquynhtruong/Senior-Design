@@ -237,11 +237,9 @@ def lstm_predict(file_name, train_data, all_mid_data, epochs=15, num_samples=10)
     builder = tf.saved_model.builder.SavedModelBuilder(export_dir)
 
     input_file_placeholder = tf.placeholder(tf.string, name='input-placeholder')
-    feature_configs = {'input_files': tf.FixedLenSequenceFeature(shape=[], dtype=tf.string, allow_missing=True, default_value='aapl')}
+    feature_configs = {'input_files': tf.FixedLenFeature(shape=1, dtype=tf.string, default_value='aapl')}
     parsed_input_files = tf.parse_example(input_file_placeholder, feature_configs)
     tf_input_file = tf.identity(parsed_input_files['input_files'], name='input_file_tensor')
-
-    output_placeholder = tf.placeholder(tf.int16, name='output-placeholder')
 
     # Used for decaying learning rate
     loss_nondecrease_count = 0
@@ -342,17 +340,11 @@ def lstm_predict(file_name, train_data, all_mid_data, epochs=15, num_samples=10)
     best_prediction_epoch = mse_seq.index(min(mse_seq)) # replace this with the epoch that you got the best results when running the plotting code
     best_prediction = predictions_over_time[best_prediction_epoch][0]
     # print('best_prediction:', best_prediction)
-    print('ndim:', best_prediction.ndim, ', size:', best_prediction.size)
 
     trend_indicator = int(best_prediction[-1] >= best_prediction[0])
     print('trend_indicator:', trend_indicator)
 
-    # output_value = tf.constant(trend_indicator, dtype=tf.int32, name='output-value')
-    feeding = session.run(output_placeholder, feed_dict={output_placeholder: 1.0})
-    print(feeding)
-    # output_tensor = tf.Variable(output_value, name='output-tensor')
-    # output_tensor.assign(output_value)
-
+    output_placeholder = tf.fill(dims=[1], value=trend_indicator)
 
     tensor_info_input = tf.saved_model.utils.build_tensor_info(tf_input_file)
     tensor_info_output = tf.saved_model.utils.build_tensor_info(output_placeholder)
