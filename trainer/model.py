@@ -9,7 +9,14 @@ import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.python.lib.io import file_io
 
-def prepare_data(df):
+def prepare_data(filenames):
+    input_file = filenames[0] # filenames is a list so extract out the string
+    # df = pd.read_csv(os.path.join('Data','cmu.us.txt'),delimiter=',',usecols=['Date','Open','High','Low','Close'])
+
+    with file_io.FileIO(input_file, mode ='r') as file:
+        df = pd.read_csv(file, delimiter=',', usecols=['Date','Open','High','Low','Close'])
+    df = df.sort_values('Date')
+
     # First calculate the mid prices from the highest and lowest
     print('type of df is:', type(df))
     high_prices = df.loc[:,'High'].as_matrix()
@@ -52,14 +59,13 @@ def prepare_data(df):
     # Used for visualization and test purposes
     all_mid_data = np.concatenate([train_data,test_data],axis=0)
 
-    return train_data, test_data, all_mid_data
+    return input_file, train_data, test_data, all_mid_data
 
 ################### Stock prediction with LSTM ###################
-def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
+def lstm_predict(file_name, train_data, all_mid_data, epochs=15, num_samples=10):
     """ Generates data, prepares hyperparameters and run the lstm training
     Args:
       num_epochs: (int) How many times through to read the data.
-      batch_size: (int) First dimension size of the Tensors returned by input_fn
 
     Returns:
       For now, index of least test loss
@@ -132,7 +138,7 @@ def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
         train_inputs.append(tf.placeholder(tf.float32, shape=[batch_size,D], name='train_inputs_%d'%ui))
         train_outputs.append(tf.placeholder(tf.float32, shape=[batch_size,1], name='train_outputs_%d'%ui))
 
-    ## Defining parameters of the LSTM and the regression layers
+    '''Defining parameters of the LSTM and the regression layers'''
 
     lstm_cells = [tf.contrib.rnn.LSTMCell(num_units=num_nodes[li], state_is_tuple=True,
                 initializer=tf.contrib.layers.xavier_initializer()) for li in range(n_layers)]
@@ -167,7 +173,7 @@ def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
     all_outputs = tf.nn.xw_plus_b(all_lstm_outputs, w, b) #calculate the LSTM outputs with the tf.nn.dynamic_rnn function
     split_outputs = tf.split(value=all_outputs, num_or_size_splits=num_unrollings, axis=0) #  split the output back to a list of num_unrolling tensors
 
-    ## Loss calculation and optimizer
+    ''' Loss calculation and optimizer'''
 
     # When calculating the loss you need to be careful about the exact form, because you calculate loss of all the unrolled steps at the same time
     # Therefore, take the mean error or each batch and get the sum of that over all the unrolled steps
@@ -229,6 +235,13 @@ def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
     tf.global_variables_initializer().run()
     export_dir = os.path.join('pred_output', 'run_' + time.strftime("%Y%m%d-%H%M%S"))
     builder = tf.saved_model.builder.SavedModelBuilder(export_dir)
+
+    input_file_placeholder = tf.placeholder(tf.string, name='input-placeholder')
+    feature_configs = {'input_files': tf.FixedLenSequenceFeature(shape=[], dtype=tf.string, allow_missing=True, default_value='aapl')}
+    parsed_input_files = tf.parse_example(input_file_placeholder, feature_configs)
+    tf_input_file = tf.identity(parsed_input_files['input_files'], name='input_file_tensor')
+
+    output_placeholder = tf.placeholder(tf.int16, name='output-placeholder')
 
     # Used for decaying learning rate
     loss_nondecrease_count = 0
@@ -298,8 +311,8 @@ def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
                 session.run(reset_sample_states)
 
                 predictions_seq.append(np.array(our_predictions))
-                print('w_i:', w_i)
-                print('\nour_predictions:', our_predictions)
+                # print('w_i:', w_i)
+                # print('\nour_predictions:', our_predictions)
 
                 mse_test_loss /= n_predict_once
                 mse_test_loss_seq.append(mse_test_loss)
@@ -326,34 +339,35 @@ def lstm_predict(train_data, all_mid_data, epochs=15, num_samples=10):
             predictions_over_time.append(predictions_seq)
             print('\tFinished Predictions:\n')#, predictions_seq)
 
-    tensor_info_train_inputs = tf.saved_model.utils.build_tensor_info(train_inputs[1])
-    tensor_info_train_outputs = tf.saved_model.utils.build_tensor_info(train_outputs[1])
+    best_prediction_epoch = mse_seq.index(min(mse_seq)) # replace this with the epoch that you got the best results when running the plotting code
+    best_prediction = predictions_over_time[best_prediction_epoch][0]
+    # print('best_prediction:', best_prediction)
+    print('ndim:', best_prediction.ndim, ', size:', best_prediction.size)
+
+    trend_indicator = int(best_prediction[-1] >= best_prediction[0])
+    print('trend_indicator:', trend_indicator)
+
+    # output_value = tf.constant(trend_indicator, dtype=tf.int32, name='output-value')
+    feeding = session.run(output_placeholder, feed_dict={output_placeholder: 1.0})
+    print(feeding)
+    # output_tensor = tf.Variable(output_value, name='output-tensor')
+    # output_tensor.assign(output_value)
+
+
+    tensor_info_input = tf.saved_model.utils.build_tensor_info(tf_input_file)
+    tensor_info_output = tf.saved_model.utils.build_tensor_info(output_placeholder)
 
     prediction_signature = (
       tf.saved_model.signature_def_utils.build_signature_def(
-          inputs={'train_inputs': tensor_info_train_inputs},
-          outputs={'train_outputs': tensor_info_train_outputs},
-          method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME))
+          inputs={'input_values': tensor_info_input},
+          outputs={'output_values': tensor_info_output},
+          method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME)
+    )
 
-      # builder.add_meta_graph_and_variables(session, [tf.saved_model.tag_constants.TRAINING], strip_default_attrs=True)
     builder.add_meta_graph_and_variables(
         session, [tf.saved_model.tag_constants.SERVING],
-        signature_def_map={
-            'predict_prices': prediction_signature
-        },
+        signature_def_map={'predict_prices': prediction_signature},
         main_op=tf.tables_initializer(),
         strip_default_attrs=True)
 
     builder.save()
-
-    best_prediction_epoch = mse_seq.index(min(mse_seq)) # replace this with the epoch that you got the best results when running the plotting code
-    print('best_prediction_epoch', predictions_over_time[best_prediction_epoch])
-
-def input_fn(filenames):
-    input_file = filenames[0] # filenames is a list so extract out the string
-    # df = pd.read_csv(os.path.join('Data','cmu.us.txt'),delimiter=',',usecols=['Date','Open','High','Low','Close'])
-
-    with file_io.FileIO(input_file, mode ='r') as file:
-        dataframe = pd.read_csv(file, delimiter=',', usecols=['Date','Open','High','Low','Close'])
-    dataframe = dataframe.sort_values('Date')
-    return dataframe

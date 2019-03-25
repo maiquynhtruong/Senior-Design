@@ -5,16 +5,14 @@ import os
 import tensorflow as tf
 
 import trainer.model as model
-# import model
+
+PROJECT_ID = 'fluid-mote-232300-mlengine'
+SOURCE_URL = 'https://storage.googleapis.com/'+ PROJECT_ID + '/Data/'
 
 def train_and_evaluate(args):
     """Run the training and evaluate using the high level API."""
-    train_input = model.input_fn(
-      args.train_files,
-    )
-
-    train_data, test_data, all_mid_data = model.prepare_data(train_input)
-    model.lstm_predict(train_data, all_mid_data, epochs=args.num_epochs, num_samples=args.num_samples)
+    file_name, train_data, test_data, all_mid_data = model.prepare_data(args.train_files)
+    model.lstm_predict(file_name, train_data, all_mid_data, epochs=args.num_epochs, num_samples=args.num_samples)
 
 
 if __name__ == '__main__':

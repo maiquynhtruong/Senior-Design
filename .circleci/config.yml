@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       # - image: circleci/python:3.4.9
-      - image: google/cloud-sdk:1.4 # to get Python3
+      - image: google/cloud-sdk:latest # to get Python3
     environment:
       TRAIN_DATA:gs://$GOOGLE_BUCKET_NAME/Data
       EVAL_DATA:gs://$GOOGLE_BUCKET_NAME/Data
