@@ -147,17 +147,14 @@ gcloud ml-engine local predict \
   - Set up a few variables:
     ```
     JSON_INSTANCES=pred_request_json/example1.json
-    MODEL=stock_advisor # Or some other name
-    SIGNATURE_NAME=DEFAULT_SERVING_SIGNATURE_DEF_KEY
-    VERSION=1.0.0
+    MODEL_DIR=pred_output/run_20190326-145225/ # The SavedModel output from running trainer/model.py
     ```
 
   ```
   gcloud ml-engine local predict \
   --model-dir $MODEL_DIR \
   --json-instances $JSON_INSTANCES
-  #--text-instances $TEXT_INSTANCES \ # Not sure which to choose
-  #--signature-name $SIGNATURE_NAME # Probably unnecessary
+  #--text-instances $TEXT_INSTANCES \ # If input file is a text file instead of JSON
   ```
 11. Make request to gcloud for [online prediction](https://cloud.google.com/sdk/gcloud/reference/ml-engine/predict)
 
@@ -165,6 +162,4 @@ gcloud ml-engine local predict \
   gcloud ml-engine predict \
   --model $MODEL \
   --json-instances $JSON_INSTANCES \
-  --signature-name $SIGNATURE_NAME 
-  # --version $VERSION
   ```
