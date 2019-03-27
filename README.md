@@ -66,30 +66,30 @@ The steps are very much based on Cloud ML Engine for Tensorflow [Getting Started
   - Create `setup.py`
   - When you make your application into a Python package, you create a namespace. For example, if you create a package named `trainer`, and your main module is called `task.py`, you specify that package with the name `trainer.task`.
 
-5. (Optional) Run a local training job
+5. Run a local training job
 
 >A local training job loads your Python training program and starts a training process in an environment that's similar to that of a live Cloud ML Engine cloud training job.
 
   - Specify an output directory and set a `MODEL_DIR` variable
-  ```
-  MODEL_DIR=output
-  ```
+    ```
+    MODEL_DIR=output
+    ```
   - Delete the contents of the output directory in case data remains from a previous training run.
-  ```
-  rm -rf $MODEL_DIR/*
-  ```
+    ```
+    rm -rf $MODEL_DIR/*
+    ```
   - Run your training locally:
-  ```
-  gcloud ml-engine local train \
-    --module-name trainer.task \
-    --package-path trainer/ \
-    --job-dir $MODEL_DIR \
-    -- \
-    --train-files $TRAIN_DATA/aapl.us.txt \
-    --eval-files $EVAL_DATA/aapl.us.txt \
-    --num-epochs 10 \
-    --num-samples 10
-  ```
+    ```
+    gcloud ml-engine local train \
+      --module-name trainer.task \
+      --package-path trainer/ \
+      --job-dir $MODEL_DIR \
+      -- \
+      --train-files $TRAIN_DATA/aapl.us.txt \
+      --eval-files $EVAL_DATA/aapl.us.txt \
+      --num-epochs 10 \
+      --num-samples 10
+    ```
 
 
 6. To run a single-instance training job in the cloud, package the application and submit training job (at the same time)
@@ -115,35 +115,35 @@ The steps are very much based on Cloud ML Engine for Tensorflow [Getting Started
 7. Before we deploy and get prediction, we need to [export the model to a SavedModel](https://www.tensorflow.org/programmers_guide/saved_model#performing_the_export). A `saved_model` folder is created that save variables and execution graph each run.
 
   - The following command shows all available `SignatureDef` keys in a `MetaGraphDef`:
-  ```
-  saved_model_cli show --dir /tmp/<saved_model_dir> --tag_set serve
-  ```
-  where `saved_model_dir` is the folder, for example: `run_20190322-121359`
+    ```
+    saved_model_cli show --dir /tmp/<saved_model_dir> --tag_set serve
+    ```
+    where `saved_model_dir` is the folder, for example: `run_20190322-121359`
 
   - To show all available information in the `SavedModel`, run:
-  ```
-  saved_model_cli show \
-  --dir /pred_output/<saved_model_dir> \
-  --all
-  ```
+    ```
+    saved_model_cli show \
+    --dir /pred_output/<saved_model_dir> \
+    --all
+    ```
 
   - Invoke the `run` command to run a graph computation, passing inputs and then displaying (and optionally saving) the outputs. Here's the syntax:
-  ```
-  saved_model_cli run \
-  --dir pred_output/run_20190322-121359/ \
-  --tag_set serve \
-  --signature_def serving_default \
-  --inputs 'aapl='$TRAIN_DATA'/aapl.us.txt' \
-  --outdir /pred_output/output_dir
-  ```
+    ```
+    saved_model_cli run \
+    --dir pred_output/run_20190322-121359/ \
+    --tag_set serve \
+    --signature_def serving_default \
+    --inputs 'aapl='$TRAIN_DATA'/aapl.us.txt' \
+    --outdir /pred_output/output_dir
+    ```
   - After we have a working `saved_model`, store the SavedModel in Cloud Storage by running:
-    ```
-    gsutil cp -r pred_output/run_20190326-194717/  gs://$BUCKET_NAME/
-    ```
+      ```
+      gsutil cp -r pred_output/run_20190326-194717/  gs://$BUCKET_NAME/
+      ```
 8. Create input file and [format the input for prediction](https://cloud.google.com/ml-engine/docs/tensorflow/online-predict#formatting_your_input_for_online_prediction). In this repo the input files are in `pred_request` folder:
-  ```
-  {"input_values": ["aapl"]}
-  ```
+    ```
+    {"input_values": ["aapl"]}
+    ```
   Note that the root tag has the be the same as the input tensor name
 9. Test prediction locally by using [gcloud local prediction](https://cloud.google.com/sdk/gcloud/reference/ml-engine/local/predict)
   - Set up a few variables:
