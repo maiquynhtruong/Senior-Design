@@ -35,7 +35,7 @@ import java.io.File;
  * Sample code for doing Cloud Machine Learning Engine online prediction in Java.
  */
 
-public class OnlinePredictionSample {
+public class GCloudAPI {
   public static void main(String[] args) throws Exception {
     HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
     JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
