@@ -70,7 +70,7 @@ The steps are very much based on Cloud ML Engine for Tensorflow [Getting Started
 
 >A local training job loads your Python training program and starts a training process in an environment that's similar to that of a live Cloud ML Engine cloud training job.
 
-  - Specify an output directory and set a MODEL_DIR variable
+  - Specify an output directory and set a `MODEL_DIR` variable
   ```
   MODEL_DIR=output
   ```
@@ -112,15 +112,7 @@ The steps are very much based on Cloud ML Engine for Tensorflow [Getting Started
 
   Monitor the progress of the training job by watching the command-line output or in **ML Engine > Jobs** on [Google Cloud Platform Console](https://console.cloud.google.com/mlengine/jobs?). More details in [Monitor Training page](https://cloud.google.com/ml-engine/docs/tensorflow/monitor-training).
 
-7. Next step is to deploy a model. There's a separate page about [deploying models](https://cloud.google.com/ml-engine/docs/tensorflow/deploying-models).
-
-8. Test prediction locally
-```
-gcloud ml-engine local predict \
---model-dir $MODEL_DIR \
---text-instances `path/to/training/file/aapl.us.txt`
-```
-9. A `saved_model` folder is created that save variables and execution graph each run.
+7. Before we deploy and get prediction, we need to [export the model to a SavedModel](https://www.tensorflow.org/programmers_guide/saved_model#performing_the_export). A `saved_model` folder is created that save variables and execution graph each run.
 
   - The following command shows all available `SignatureDef` keys in a `MetaGraphDef`:
   ```
@@ -144,10 +136,19 @@ gcloud ml-engine local predict \
   --inputs 'aapl='$TRAIN_DATA'/aapl.us.txt' \
   --outdir /pred_output/output_dir
   ```
-10. Test prediction locally by using [gcloud local prediction](https://cloud.google.com/sdk/gcloud/reference/ml-engine/local/predict)
+  - After we have a working `saved_model`, store the SavedModel in Cloud Storage by running:
+    ```
+    gsutil cp -r pred_output/run_20190326-194717/  gs://$BUCKET_NAME/
+    ```
+8. Create input file and [format the input for prediction](https://cloud.google.com/ml-engine/docs/tensorflow/online-predict#formatting_your_input_for_online_prediction). In this repo the input files are in `pred_request` folder:
+  ```
+  {"input_values": ["aapl"]}
+  ```
+  Note that the root tag has the be the same as the input tensor name
+9. Test prediction locally by using [gcloud local prediction](https://cloud.google.com/sdk/gcloud/reference/ml-engine/local/predict)
   - Set up a few variables:
     ```
-    JSON_INSTANCES=pred_request_json/example1.json
+    JSON_INSTANCES=pred_request/example1.json
     MODEL_DIR=pred_output/run_20190326-145225/ # The SavedModel output from running trainer/model.py
     ```
   - Get prediction locally
@@ -189,9 +190,8 @@ gcloud ml-engine local predict \
     MODEL_NAME=stock_advisor
     ```
   - Request prediction from the newly create model
-
-  ```
-  gcloud ml-engine predict --model $MODEL_NAME  \
-                   --version $VERSION_NAME \
-                   --json-instances $JSON_INSTANCES
-  ```
+    ```
+    gcloud ml-engine predict --model $MODEL_NAME  \
+                     --version $VERSION_NAME \
+                     --json-instances $JSON_INSTANCES
+    ```
