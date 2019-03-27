@@ -6,9 +6,6 @@ import tensorflow as tf
 
 import trainer.model as model
 
-PROJECT_ID = 'fluid-mote-232300-mlengine'
-SOURCE_URL = 'https://storage.googleapis.com/'+ PROJECT_ID + '/Data/'
-
 def train_and_evaluate(args):
     """Run the training and evaluate using the high level API."""
     file_name, train_data, test_data, all_mid_data = model.prepare_data(args.train_files)

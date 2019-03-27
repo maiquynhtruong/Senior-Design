@@ -344,7 +344,7 @@ def lstm_predict(file_name, train_data, all_mid_data, epochs=15, num_samples=10)
     trend_indicator = int(best_prediction[-1] >= best_prediction[0])
     print('trend_indicator:', trend_indicator)
 
-    output_placeholder = tf.fill(dims=[1], value=trend_indicator)
+    output_placeholder = tf.constant(value=trend_indicator, name="output_file_tensor")
 
     tensor_info_input = tf.saved_model.utils.build_tensor_info(tf_input_file)
     tensor_info_output = tf.saved_model.utils.build_tensor_info(output_placeholder)

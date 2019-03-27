@@ -19,6 +19,7 @@ The steps are very much based on Cloud ML Engine for Tensorflow [Getting Started
     ```
     PROJECT_ID=$(gcloud config list project --format "value(core.project)") # core.project is the project ID
     BUCKET_NAME=${PROJECT_ID}-mlengine
+    STORAGE_PATH=gs://$BUCKET_NAME/
     ```
   - Select a region for your bucket and set a `REGION` environment variable
     ```
@@ -149,17 +150,48 @@ gcloud ml-engine local predict \
     JSON_INSTANCES=pred_request_json/example1.json
     MODEL_DIR=pred_output/run_20190326-145225/ # The SavedModel output from running trainer/model.py
     ```
+  - Get prediction locally
+    ```
+    gcloud ml-engine local predict \
+    --model-dir $MODEL_DIR \
+    --json-instances $JSON_INSTANCES
+    #--text-instances $TEXT_INSTANCES \ # If input file is a text file instead of JSON
+    ```
+11. Make request to gcloud for [online prediction](https://cloud.google.com/sdk/gcloud/reference/ml-engine/predict):
+  - If needed, create the model that you are deploying a new version of. There are [multiple ways](https://cloud.google.com/ml-engine/docs/tensorflow/deploying-models#creating_a_model_version) to do so.
+    ```
+    gcloud ml-engine models create "stock_advisor"
+    ```
+  - Create a new version. `origin` is where the SavedModel is saved:
+    ```
+    gcloud ml-engine versions create "version1" --model "stock_advisor" --origin $STORAGE_PATH/run_20190326-194717 --runtime-version $RUNTIME_VERSION --python-version $PYTHON_VERSION
+    ```
+  - Get information about your new version:
+    ```
+    gcloud ml-engine versions describe "version1" --model "stock_advisor"
+    ```
+    The output should look something like this:
+    ```
+    createTime: '2019-03-27T00:14:30Z'
+    deploymentUri: gs://fluid-mote-232300-mlengine/run_20190326-194717
+    etag: aNdXFOtObrE=
+    framework: TENSORFLOW
+    isDefault: true
+    machineType: mls1-c1-m2
+    name: projects/fluid-mote-232300/models/stock_advisor/versions/version1
+    pythonVersion: '3.5'
+    runtimeVersion: '1.13'
+    state: READY
+    ```
+  - Since we just created a model and version, let's create `MODEL_NAME` and `VERSION_NAME` variables:
+    ```
+    VERSION_NAME=version1
+    MODEL_NAME=stock_advisor
+    ```
+  - Request prediction from the newly create model
 
   ```
-  gcloud ml-engine local predict \
-  --model-dir $MODEL_DIR \
-  --json-instances $JSON_INSTANCES
-  #--text-instances $TEXT_INSTANCES \ # If input file is a text file instead of JSON
-  ```
-11. Make request to gcloud for [online prediction](https://cloud.google.com/sdk/gcloud/reference/ml-engine/predict)
-
-  ```
-  gcloud ml-engine predict \
-  --model $MODEL \
-  --json-instances $JSON_INSTANCES \
+  gcloud ml-engine predict --model $MODEL_NAME  \
+                   --version $VERSION_NAME \
+                   --json-instances $JSON_INSTANCES
   ```
