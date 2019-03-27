@@ -1,3 +1,4 @@
+package com.example.martinruiz.myapplication.API;
 /*
  * Copyright 2017 Google Inc.
  *
@@ -14,8 +15,11 @@
  * limitations under the License.
  */
 
+import android.util.Log;
+
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.ByteArrayContent;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpContent;
@@ -36,39 +40,44 @@ import java.io.File;
  */
 
 public class GCloudAPI {
-  public static void main(String[] args) throws Exception {
-    HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-    JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-    Discovery discovery = new Discovery.Builder(httpTransport, jsonFactory, null).build();
 
-    RestDescription api = discovery.apis().getRest("ml", "v1").execute();
-    RestMethod method = api.getResources().get("projects").getMethods().get("predict");
-
-    JsonSchema param = new JsonSchema();
-
-    String projectId = "fluid-mote-232300-mlengine";
-    String sourceURL = "https://storage.googleapis.com/"+ projectId + "/Data/";
+    static String projectId = "fluid-mote-232300-mlengine";
+    static String sourceURL = "https://storage.googleapis.com/"+ projectId + "/Data/";
     // You should have already deployed a model and a version.
     // For reference, see https://cloud.google.com/ml-engine/docs/deploying-models.
-    String modelId = "stock_advisor";
-    String versionId = "version1"; // Default version
-    param.set(
-        "name", String.format("projects/%s/models/%s/versions/%s", projectId, modelId, versionId));
+    static String modelId = "stock_advisor";
+    static String versionId = "version1"; // Default version
 
-    GenericUrl url =
-        new GenericUrl(UriTemplate.expand(api.getBaseUrl() + method.getPath(), param, true));
-    System.out.println(url);
 
-    String contentType = "application/json";
-    File requestBodyFile = new File("input.txt");
-    HttpContent content = new FileContent(contentType, requestBodyFile);
-    System.out.println(content.getLength());
+    public static String getResponse(String stockName) throws Exception{
+        HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+        JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+        Discovery discovery = new Discovery.Builder(httpTransport, jsonFactory, null).build();
 
-    GoogleCredential credential = GoogleCredential.getApplicationDefault();
-    HttpRequestFactory requestFactory = httpTransport.createRequestFactory(credential);
-    HttpRequest request = requestFactory.buildRequest(method.getHttpMethod(), url, content);
+        RestDescription api = discovery.apis().getRest("ml", "v1").execute();
+        RestMethod method = api.getResources().get("projects").getMethods().get("predict");
 
-    String response = request.execute().parseAsString();
-    System.out.println(response);
-  }
+        JsonSchema param = new JsonSchema();
+
+        param.set(
+                "name", String.format("projects/%s/models/%s/versions/%s", projectId, modelId, versionId));
+
+        GenericUrl url =
+                new GenericUrl(UriTemplate.expand(api.getBaseUrl() + method.getPath(), param, true));
+        Log.i("GCloudAPI-url: ", url.toString());
+
+        String contentType = "application/json";
+//        File requestBodyFile = new File("input.txt");
+//        HttpContent content = new FileContent(contentType, requestBodyFile);
+        String jsonInput = "{\"input_values\": [\"" + stockName + "\"]}";
+        HttpContent content = new ByteArrayContent(contentType, jsonInput.getBytes());
+        Log.i("GCloudAPI-content len:", "" + content.getLength());
+
+        GoogleCredential credential = GoogleCredential.getApplicationDefault();
+        HttpRequestFactory requestFactory = httpTransport.createRequestFactory(credential);
+        HttpRequest request = requestFactory.buildRequest(method.getHttpMethod(), url, content);
+
+        String response = request.execute().parseAsString();
+        return response;
+    }
 }
