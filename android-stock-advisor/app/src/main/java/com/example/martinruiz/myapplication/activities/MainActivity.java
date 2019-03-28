@@ -13,6 +13,7 @@ import android.view.View;
 import com.example.martinruiz.myapplication.R;
 import com.example.martinruiz.myapplication.adapters.StockAdapter;
 import com.example.martinruiz.myapplication.interfaces.onSwipeListener;
+import com.example.martinruiz.myapplication.models.CompanyStock;
 import com.example.martinruiz.myapplication.models.Stock;
 import com.example.martinruiz.myapplication.utils.ItemTouchHelperCallback;
 
@@ -40,16 +41,24 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         stockList = getStocks();
-//        if (stockList.size() == 0)
+        if (stockList.size() == 0) {
+      //      showFabPrompt();
+        }
 
-//        gcpServices =
+        gcpServices = API.getApi().create(GcpServices.class);
 
         layoutManager = new LinearLayoutManager(this);
 
         adapter = new StockAdapter(stockList, R.layout.stock_card, this, new StockAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Stock stock, int position, View view) {
-                // passing intent to a class
+                Intent intent = new Intent(MainActivity.this,StockDetails.class);
+                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(
+                        MainActivity.this,clickView,
+                        "stockCardTransition");
+
+                intent.putExtra("company",  companyStock);
+                startActivity(intent,options.toBundle());
             }
         });
 
@@ -84,6 +93,10 @@ public class MainActivity extends AppCompatActivity {
             showAddStockAlert("Add Company","Type the company stock you want to add");
         });
 
+        swipeRefreshLayout.setColorSchemeResources(R.color.google_blue, R.color.google_green, R.color.google_red, R.color.google_yellow);
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            refreshData();
+        });
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback((onSwipeListener) adapter);
         ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(rvStock);
@@ -95,11 +108,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void addStock(String stockName) {
+        Call<CompanyStock> stocks = gcpServices.getWeatherCity(stockName, API.KEY, "metric",6);
+        stocks.enqueue(new Callback<CompanyStock>() {
+            @Override
+            public void onResponse(Call<CompanyStock> call, Response<CompanyStock> response) {
+                if(response.code()==200){
+                    CompanyStock companyStock = response.body();
+                    stocks.add(companyStock);
+                    adapter.notifyItemInserted(stocks.size()-1);
+                    recyclerView.scrollToPosition(stocks.size()-1);
 
+                }else{
+                    Toast.makeText(MainActivity.this,"Sorry, city not found",Toast.LENGTH_LONG).show();
+                }
+            }
+            @Override
+            public void onFailure(Call<CompanyStock> call, Throwable t) {
+                Toast.makeText(MainActivity.this,"Sorry, weather services are currently unavailable",Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
-    protected void updateStock(String stockName) {
+    protected void updateStock(String stockName, int index) {
+        Call<CompanyStock> stocks = gcpServices.geStocks(stockName, API.KEY, "metric",6);
+        stocks.enqueue(new Callback<CompanyStock>() {
+            @Override
+            public void onResponse(Call<CompanyStock> call, Response<CompanyStock> response) {
+                if(response.code()==200){
+                    CompanyStock companyStock = response.body();
+                    stockList.remove(index);
+                    stockList.add(index,companyStock);
+                    adapter.notifyItemChanged(index);
+                }
+            }
 
+            @Override
+            public void onFailure(Call<CompanyStock> call, Throwable t) {
+                Toast.makeText(MainActivity.this,"Sorry, can't refresh right now.",Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     List<Stock> getStocks() {
