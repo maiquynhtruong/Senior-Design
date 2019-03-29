@@ -137,15 +137,15 @@ public class MainActivityStock extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         if (title != null) builder.setTitle(title);
         if (message != null) builder.setMessage(message);
-        final View view = LayoutInflater.from(this).inflate(R.layout.dialog_add_city,null);
+        final View view = LayoutInflater.from(this).inflate(R.layout.dialog_add_stock,null);
         builder.setView(view);
-        final TextView editTextAddCityName = view.findViewById(R.id.editText_add_stock_name);
+        final TextView editTextAddStockName = view.findViewById(R.id.editText_add_stock_name);
 
         final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 
         builder.setPositiveButton("Add", (dialog, which) -> {
-            stockToAdd = editTextAddCityName.getText().toString();
+            stockToAdd = editTextAddStockName.getText().toString();
             addStock(stockToAdd);
             imm.toggleSoftInput(InputMethodManager.HIDE_NOT_ALWAYS,0);
         });
