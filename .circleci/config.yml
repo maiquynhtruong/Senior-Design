@@ -15,13 +15,13 @@ jobs:
       TRAINER_PACKAGE_PATH:"trainer/"
       MAIN_TRAINER_MODULE:"trainer.task"
       PACKAGE_STAGING_PATH:"gs://$GOOGLE_BUCKET_NAME"
-      MODEL_DIR:output
+      MODEL_DIR:"pred_output/run_20190326-145225"
     steps:
       - checkout
       - run:
           name: "Run training locally"
           command:
-            gcloud ml-engine local train --module-name trainer.task --package-path trainer/ --job-dir $MODEL_DIR -- \
+            gcloud ml-engine local train --module-name trainer.task --package-path trainer/ --job-dir $MODEL_DIR --
             --train-files $TRAIN_DATA/aapl.us.txt --eval-files $EVAL_DATA/aapl.us.txt --num-epochs 1 --num-samples 10
 
       # - run:˘
