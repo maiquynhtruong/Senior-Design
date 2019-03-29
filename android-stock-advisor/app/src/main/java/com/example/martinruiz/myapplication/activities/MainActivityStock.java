@@ -15,6 +15,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -30,6 +31,7 @@ import com.example.martinruiz.myapplication.adapters.StockAdapter;
 import com.example.martinruiz.myapplication.interfaces.onSwipeListener;
 import com.example.martinruiz.myapplication.models.Stock;
 import com.example.martinruiz.myapplication.utils.ItemTouchHelperCallback;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -169,6 +171,8 @@ public class MainActivityStock extends AppCompatActivity {
                     stockList.add(stock);
                     adapter.notifyItemInserted(stockList.size() - 1);
                     rvStock.scrollToPosition(stockList.size() - 1);
+                    Log.e("TAG", "AddSTock: "+new Gson().toJson(response.body()) );
+
                 } else {
                     Toast.makeText(MainActivityStock.this, R.string.stock_not_found, Toast.LENGTH_LONG).show();
                 }
@@ -191,6 +195,7 @@ public class MainActivityStock extends AppCompatActivity {
                     stockList.remove(index);
                     stockList.add(index, stock);
                     adapter.notifyItemChanged(index);
+                    Log.e("TAG", "updateStock: "+new Gson().toJson(response.body()) );
                 } else {
                     Toast.makeText(MainActivityStock.this, R.string.stock_unable_to_refresh, Toast.LENGTH_LONG).show();
                 }
