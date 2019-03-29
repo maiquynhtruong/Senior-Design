@@ -1,10 +1,13 @@
 package com.example.martinruiz.myapplication.activities;
 
 import android.app.ActivityOptions;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -14,10 +17,13 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.martinruiz.myapplication.API.API;
 import com.example.martinruiz.myapplication.API.APIServices.StockServices;
+import com.example.martinruiz.myapplication.API.APIServices.WeatherServices;
 import com.example.martinruiz.myapplication.API.GCloudAPI;
 import com.example.martinruiz.myapplication.R;
 import com.example.martinruiz.myapplication.adapters.StockAdapter;
@@ -33,6 +39,7 @@ import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
 
 public class MainActivityStock extends AppCompatActivity {
 
@@ -44,6 +51,7 @@ public class MainActivityStock extends AppCompatActivity {
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     @BindView(R.id.swipe_to_refresh) SwipeRefreshLayout swipeRefreshLayout;
+    private MaterialTapTargetPrompt mFabPrompt;
 
     private StockServices stockServices;
 
@@ -58,13 +66,14 @@ public class MainActivityStock extends AppCompatActivity {
         stockList = getStocks();
         if (stockList.size() == 0) { showFabPrompt(); }
 
-        layoutManager = new LinearLayoutManager(this);
+        stockServices = API.getApi().create(StockServices.class);
 
+        layoutManager = new LinearLayoutManager(this);
         adapter = new StockAdapter(stockList, R.layout.stock_card, this, (stock, position, clickView) -> {
             Intent intent = new Intent(MainActivityStock.this, StockDetails.class);
             ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(
                     MainActivityStock.this, clickView,
-                    "weatherCardTransition");
+                    "StockCardTransition");
 
             intent.putExtra("stock",  stock);
             startActivity(intent,options.toBundle());
@@ -91,33 +100,63 @@ public class MainActivityStock extends AppCompatActivity {
             }
         });
 
-        fabAddStock.setOnClickListener(view -> showAddStockAlert("Add stock", getString(R.string.add_stock_prompt)));
+        fabAddStock.setOnClickListener(view -> showAddStockAlert(getString(R.string.add_stock_title), getString(R.string.add_stock_prompt)));
 
         swipeRefreshLayout.setColorSchemeResources(R.color.google_blue, R.color.google_green, R.color.google_red, R.color.google_yellow);
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            refreshData();
-        });
+        swipeRefreshLayout.setOnRefreshListener(() -> refreshData());
 
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback((onSwipeListener) adapter);
         ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(rvStock);
-
     }
 
     public void showFabPrompt() {
+        if (mFabPrompt != null) { return; }
 
+        mFabPrompt = new MaterialTapTargetPrompt.Builder(MainActivityStock.this)
+                .setTarget(findViewById(R.id.fabAddStock))
+                .setFocalPadding(R.dimen.dp40)
+                .setPrimaryText(R.string.add_first_stock)
+                .setSecondaryText(R.string.stock_updates)
+                .setBackButtonDismissEnabled(true)
+                .setAnimationInterpolator(new FastOutSlowInInterpolator())
+                .setPromptStateChangeListener((prompt, state) -> {
+                    //Do something such as storing a value so that this prompt is never shown again
+                    if (state == MaterialTapTargetPrompt.STATE_FOCAL_PRESSED || state == MaterialTapTargetPrompt.STATE_DISMISSING ) { mFabPrompt = null; }
+                }).create();
+        mFabPrompt.show();
     }
 
     private void refreshData() {
-
+        for (int i = 0; i < stockList.size(); i++) {
+            updateStock(stockList.get(i).getName(), i);
+        }
+        swipeRefreshLayout.setRefreshing(false);
     }
 
+    private String stockToAdd ="";
     protected void showAddStockAlert(String title, String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         if (title != null) builder.setTitle(title);
         if (message != null) builder.setMessage(message);
         final View view = LayoutInflater.from(this).inflate(R.layout.dialog_add_city,null);
         builder.setView(view);
+        final TextView editTextAddCityName = view.findViewById(R.id.editText_add_stock_name);
+
+        final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+
+        builder.setPositiveButton("Add", (dialog, which) -> {
+            stockToAdd = editTextAddCityName.getText().toString();
+            addStock(stockToAdd);
+            imm.toggleSoftInput(InputMethodManager.HIDE_NOT_ALWAYS,0);
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> {
+            dialog.cancel();
+            imm.toggleSoftInput(InputMethodManager.HIDE_NOT_ALWAYS,0);
+            Toast.makeText(MainActivityStock.this,R.string.cancel,Toast.LENGTH_LONG).show();
+        });
+        builder.create().show();
     }
 
     protected void addStock(String stockName) {

@@ -1,7 +1,11 @@
 <resources>
     <string name="app_name">Stock Advisor</string>
+    <string name="add_stock_title">ADD STOCK</string>
     <string name="add_stock_prompt">Type the ticker symbol of the stock you want to add</string>
     <string name="stock_not_found">Stock Name not found. Please try again</string>
     <string name="stock_service_unavailable">Stock service is currently not available. Please try again shortly</string>
     <string name="stock_unable_to_refresh">Stock list is unable to refresh. Please try again later</string>
+    <string name="cancel">CANCEL</string>
+    <string name="add_first_stock">Add your first stock</string>
+    <string name="stock_updates">"Tap the add button and add your favorites stocks to get price and trend updates"</string>
 </resources>
