@@ -46,7 +46,17 @@ public class GCloudAPI {
     // You should have already deployed a model and a version.
     // For reference, see https://cloud.google.com/ml-engine/docs/deploying-models.
     static String modelId = "stock_advisor";
-    static String versionId = "version1"; // Default version
+    static String versionId = "version1";
+
+    public static String getTrend(String stockName) {
+        String trendIndicator = "aapl"; // Default stock name
+        try {
+             trendIndicator = getResponse(stockName);
+        } catch (Exception e) {
+            Log.i("getTrend - ", e.getMessage());
+        }
+        return trendIndicator;
+    }
 
 
     public static String getResponse(String stockName) throws Exception{
@@ -67,8 +77,6 @@ public class GCloudAPI {
         Log.i("GCloudAPI-url: ", url.toString());
 
         String contentType = "application/json";
-//        File requestBodyFile = new File("input.txt");
-//        HttpContent content = new FileContent(contentType, requestBodyFile);
         String jsonInput = "{\"input_values\": [\"" + stockName + "\"]}";
         HttpContent content = new ByteArrayContent(contentType, jsonInput.getBytes());
         Log.i("GCloudAPI-content len:", "" + content.getLength());

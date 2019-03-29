@@ -8,6 +8,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class API {
+    public static final String ALPHA_VANTAGE_BASE_URL = "https://www.alphavantage.co/";
+    public static final String ALPHA_VANTAGE_FUNCTION = "TIME_SERIES_INTRADAY";
     public static final String BASE_URL = "http://api.openweathermap.org/data/2.5/";
     public static final String KEY = "79badf94102e008963c2d50b6cfa43f2";
 
@@ -17,7 +19,7 @@ public class API {
     public static Retrofit getApi(){
         if(retrofit == null){
             retrofit =new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
+                    .baseUrl(ALPHA_VANTAGE_BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
