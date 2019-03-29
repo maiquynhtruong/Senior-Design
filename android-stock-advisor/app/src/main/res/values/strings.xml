@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Stock Advisor</string>
     <string name="add_stock_prompt">Type the ticker symbol of the stock you want to add</string>
+    <string name="stock_not_found">Stock Name not found. Please try again</string>
+    <string name="stock_service_unavailable">Stock service is currently not available. Please try again shortly</string>
 </resources>

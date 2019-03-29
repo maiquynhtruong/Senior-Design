@@ -19,8 +19,8 @@ public class Stock implements Serializable {
         this.price = price;
     }
 
-    String name;
+    String name; // Company
     Double price;
-    Double predictedPrice;
+    boolean trend;
 
 }

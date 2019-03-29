@@ -11,8 +11,10 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
+import android.widget.Toast;
 
+import com.example.martinruiz.myapplication.API.API;
+import com.example.martinruiz.myapplication.API.APIServices.StockServices;
 import com.example.martinruiz.myapplication.API.GCloudAPI;
 import com.example.martinruiz.myapplication.R;
 import com.example.martinruiz.myapplication.adapters.StockAdapter;
@@ -25,17 +27,23 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivityStock extends AppCompatActivity {
 
     private List<Stock> stockList;
     private String stockToAdd ="aapl";
 
+    @BindView(R.id.recycler_view_stock) RecyclerView recyclerView;
     @BindView(R.id.fabAddStock) FloatingActionButton fabAddStock;
     @BindView(R.id.recycler_view_stock) RecyclerView rvStock;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     @BindView(R.id.swipe_to_refresh) SwipeRefreshLayout swipeRefreshLayout;
+
+    private StockServices stockServices;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,11 +56,7 @@ public class MainActivityStock extends AppCompatActivity {
         stockList = getStocks();
         if (stockList.size() == 0) { showFabPrompt(); }
 
-        try {
-            String GCPServices = GCloudAPI.getResponse("aapl");
-        } catch (Exception e) {
-            Log.e("MainActStock-gcpserv", e.getMessage());
-        }
+        String GCPServices = GCloudAPI.getTrend(stockToAdd);
 
         layoutManager = new LinearLayoutManager(this);
 
@@ -113,7 +117,27 @@ public class MainActivityStock extends AppCompatActivity {
     }
 
     protected void addStock(String stockName) {
+        // Substitute alpha_vantage_api_key with your key
+        Call<Stock> stockRetrofit = stockServices.getStockPrice(API.ALPHA_VANTAGE_FUNCTION, stockName, "5min", getString(R.string.alpha_vantage_api_key));
+        String stockTrend = GCloudAPI.getTrend(stockName);
+        stockRetrofit.enqueue(new Callback<Stock>() {
+            @Override
+            public void onResponse(Call<Stock> call, Response<Stock> response) {
+                if (response.code() == 200) {
+                    Stock stock = response.body();
+                    stockList.add(stock);
+                    adapter.notifyItemInserted(stockList.size() - 1);
+                    recyclerView.scrollToPosition(stockList.size() - 1);
+                } else {
+                    Toast.makeText(MainActivityStock.this, R.string.stock_not_found, Toast.LENGTH_LONG).show();
+                }
+            }
 
+            @Override
+            public void onFailure(Call<Stock> call, Throwable t) {
+                Toast.makeText(MainActivityStock.this, R.string.stock_service_unavailable, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     protected void updateStock(String stockName) {
