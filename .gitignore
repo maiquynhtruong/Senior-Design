@@ -4,3 +4,5 @@ venv/
 venv2/
 cloudml-samples-master/
 pred_output/
+.DS_Store
+trainer/__pycache__/
