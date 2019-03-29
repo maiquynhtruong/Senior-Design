@@ -44,8 +44,6 @@ import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
 public class MainActivityStock extends AppCompatActivity {
 
     private List<Stock> stockList;
-
-    @BindView(R.id.recycler_view_stock) RecyclerView recyclerView;
     @BindView(R.id.fabAddStock) FloatingActionButton fabAddStock;
     @BindView(R.id.recycler_view_stock) RecyclerView rvStock;
     private RecyclerView.Adapter adapter;
@@ -170,7 +168,7 @@ public class MainActivityStock extends AppCompatActivity {
                     Stock stock = response.body();
                     stockList.add(stock);
                     adapter.notifyItemInserted(stockList.size() - 1);
-                    recyclerView.scrollToPosition(stockList.size() - 1);
+                    rvStock.scrollToPosition(stockList.size() - 1);
                 } else {
                     Toast.makeText(MainActivityStock.this, R.string.stock_not_found, Toast.LENGTH_LONG).show();
                 }

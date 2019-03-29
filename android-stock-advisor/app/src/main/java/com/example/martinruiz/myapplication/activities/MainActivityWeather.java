@@ -1,13 +1,11 @@
 package com.example.martinruiz.myapplication.activities;
 
-import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
@@ -18,13 +16,10 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.InputType;
-import android.transition.Explode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +31,6 @@ import com.example.martinruiz.myapplication.interfaces.onSwipeListener;
 import com.example.martinruiz.myapplication.models.CityWeather;
 import com.example.martinruiz.myapplication.utils.ItemTouchHelperCallback;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +41,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivityWeather extends AppCompatActivity {
 
     private List<CityWeather> cities;
     @BindView(R.id.recyclerViewWeatherCards) RecyclerView recyclerView;
@@ -82,9 +76,9 @@ public class MainActivity extends AppCompatActivity {
         adapter = new CityWeatherAdapter(cities, R.layout.weather_card, this, new CityWeatherAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(CityWeather cityWeather, int position, View clickView) {
-                Intent intent = new Intent(MainActivity.this,WeatherDetails.class);
+                Intent intent = new Intent(MainActivityWeather.this,WeatherDetails.class);
                 ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(
-                        MainActivity.this,clickView,
+                        MainActivityWeather.this,clickView,
                         "weatherCardTransition");
 
                 intent.putExtra("city",  cityWeather);
@@ -142,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
         {
             return;
         }
-        mFabPrompt = new MaterialTapTargetPrompt.Builder(MainActivity.this)
+        mFabPrompt = new MaterialTapTargetPrompt.Builder(MainActivityWeather.this)
                 .setTarget(findViewById(R.id.fabAddCity))
                 .setFocalPadding(R.dimen.dp40)
                 .setPrimaryText("Add your first City")
@@ -196,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
                 imm.toggleSoftInput(InputMethodManager.HIDE_NOT_ALWAYS,0);
-                Toast.makeText(MainActivity.this,"Cancel",Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivityWeather.this,"Cancel",Toast.LENGTH_LONG).show();
             }
         });
         builder.create().show();
@@ -218,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<CityWeather> call, Throwable t) {
-                Toast.makeText(MainActivity.this,"Sorry, can't refresh right now.",Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivityWeather.this,"Sorry, can't refresh right now.",Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -237,12 +231,12 @@ public class MainActivity extends AppCompatActivity {
                     recyclerView.scrollToPosition(cities.size()-1);
 
                 }else{
-                    Toast.makeText(MainActivity.this,"Sorry, city not found",Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivityWeather.this,"Sorry, city not found",Toast.LENGTH_LONG).show();
                 }
             }
             @Override
             public void onFailure(Call<CityWeather> call, Throwable t) {
-                Toast.makeText(MainActivity.this,"Sorry, weather services are currently unavailable",Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivityWeather.this,"Sorry, weather services are currently unavailable",Toast.LENGTH_LONG).show();
             }
         });
     }

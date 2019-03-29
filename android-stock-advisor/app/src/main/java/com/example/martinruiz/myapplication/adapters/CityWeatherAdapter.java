@@ -66,7 +66,7 @@ public class CityWeatherAdapter extends RecyclerView.Adapter<CityWeatherAdapter.
         Snackbar.make(parentView, "Removed", Snackbar.LENGTH_LONG)
                 .setAction("Undo", v -> {
                     addItem(position, tempCity);
-                    //new MainActivity().recyclerScrollTo(position);
+                    //new MainActivityWeather().recyclerScrollTo(position);
                 }).show();
 
     }

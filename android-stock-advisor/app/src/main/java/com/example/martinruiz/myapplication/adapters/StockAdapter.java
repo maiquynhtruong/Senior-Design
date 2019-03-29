@@ -3,11 +3,13 @@ package com.example.martinruiz.myapplication.adapters;
 import android.app.Activity;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.martinruiz.myapplication.R;
+import com.example.martinruiz.myapplication.interfaces.onSwipeListener;
 import com.example.martinruiz.myapplication.models.Stock;
 
 import org.w3c.dom.Text;
@@ -17,7 +19,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> {
+public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> implements onSwipeListener {
 
     List<Stock> stockList;
     private int layoutReference;
@@ -35,6 +37,7 @@ public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         parentView = parent;
+        View view = LayoutInflater.from(activity).inflate(layoutReference, parent, false);
         return null;
     }
 

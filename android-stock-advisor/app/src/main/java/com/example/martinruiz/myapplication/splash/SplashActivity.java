@@ -9,7 +9,8 @@ import android.os.Bundle;
 import android.transition.Explode;
 
 import com.example.martinruiz.myapplication.R;
-import com.example.martinruiz.myapplication.activities.MainActivity;
+import com.example.martinruiz.myapplication.activities.MainActivityStock;
+import com.example.martinruiz.myapplication.activities.MainActivityWeather;
 import com.mikhaellopez.circularfillableloaders.CircularFillableLoaders;
 
 public class SplashActivity extends AppCompatActivity {
@@ -32,7 +33,7 @@ public class SplashActivity extends AppCompatActivity {
         Explode explode = new Explode();
         getWindow().setExitTransition(explode);
 
-        Intent intentToMain = new Intent(SplashActivity.this, g;
+        Intent intentToMain = new Intent(SplashActivity.this, MainActivityStock.class);
         startActivity(intentToMain);
 
 
