@@ -6,11 +6,14 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.martinruiz.myapplication.API.API;
@@ -113,7 +116,11 @@ public class MainActivityStock extends AppCompatActivity {
     }
 
     protected void showAddStockAlert(String title, String message) {
-
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        if (title != null) builder.setTitle(title);
+        if (message != null) builder.setMessage(message);
+        final View view = LayoutInflater.from(this).inflate(R.layout.dialog_add_city,null);
+        builder.setView(view);
     }
 
     protected void addStock(String stockName) {
@@ -140,11 +147,29 @@ public class MainActivityStock extends AppCompatActivity {
         });
     }
 
-    protected void updateStock(String stockName) {
+    protected void updateStock(String stockName, int index) {
+        Call<Stock> stockRetrofit = stockServices.getStockPrice(API.ALPHA_VANTAGE_FUNCTION, stockName, "5min", getString(R.string.alpha_vantage_api_key));
+        stockRetrofit.enqueue(new Callback<Stock>() {
+            @Override
+            public void onResponse(Call<Stock> call, Response<Stock> response) {
+                if (response.code() == 200) {
+                    Stock stock = response.body();
+                    stockList.remove(index);
+                    stockList.add(index, stock);
+                    adapter.notifyItemChanged(index);
+                } else {
+                    Toast.makeText(MainActivityStock.this, R.string.stock_unable_to_refresh, Toast.LENGTH_LONG).show();
+                }
+            }
 
+            @Override
+            public void onFailure(Call<Stock> call, Throwable t) {
+                Toast.makeText(MainActivityStock.this, R.string.stock_service_unavailable, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     List<Stock> getStocks() {
-        return new ArrayList<Stock>();
+        return new ArrayList<>();
     }
 }
