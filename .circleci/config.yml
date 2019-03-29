@@ -22,7 +22,7 @@ jobs:
           name: "Run training locally"
           command:
             gcloud ml-engine local train --module-name trainer.task --package-path trainer/ --job-dir $MODEL_DIR --
-            --train-files $TRAIN_DATA/aapl.us.txt --eval-files $EVAL_DATA/aapl.us.txt --num-epochs 1 --num-samples 10
+            --train-files $TRAIN_DATA/aapl.us.txt --eval-files $EVAL_DATA/aapl.us.txt --num-epochs 10 --num-samples 10
 
       # - run:˘
           # name: "Run a training job on the cloud"
