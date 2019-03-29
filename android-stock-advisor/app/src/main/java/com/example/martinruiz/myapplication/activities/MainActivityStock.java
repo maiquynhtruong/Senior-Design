@@ -37,7 +37,6 @@ import retrofit2.Response;
 public class MainActivityStock extends AppCompatActivity {
 
     private List<Stock> stockList;
-    private String stockToAdd ="aapl";
 
     @BindView(R.id.recycler_view_stock) RecyclerView recyclerView;
     @BindView(R.id.fabAddStock) FloatingActionButton fabAddStock;
@@ -58,8 +57,6 @@ public class MainActivityStock extends AppCompatActivity {
 
         stockList = getStocks();
         if (stockList.size() == 0) { showFabPrompt(); }
-
-        String GCPServices = GCloudAPI.getTrend(stockToAdd);
 
         layoutManager = new LinearLayoutManager(this);
 
