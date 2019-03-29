@@ -19,7 +19,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.WeatherDetails" />
+        <activity android:name=".activities.StockDetails" />
         <activity android:name=".splash.SplashActivity">
         </activity>
         <meta-data
