@@ -32,7 +32,7 @@ public class SplashActivity extends AppCompatActivity {
         Explode explode = new Explode();
         getWindow().setExitTransition(explode);
 
-        Intent intentToMain = new Intent(SplashActivity.this, MainActivity.class);
+        Intent intentToMain = new Intent(SplashActivity.this, g;
         startActivity(intentToMain);
 
 

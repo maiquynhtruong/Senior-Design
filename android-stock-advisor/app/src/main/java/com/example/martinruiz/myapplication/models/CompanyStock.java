@@ -12,7 +12,7 @@ import java.util.List;
 public class CompanyStock implements Serializable{
     private Company company;
     @SerializedName("list")
-    private List<Stock> weeklyStock;
+    private List<Stock> dailyPrices;
 
     public Company getCompany() {
         return company;
@@ -22,12 +22,12 @@ public class CompanyStock implements Serializable{
         this.company = company;
     }
 
-    public List<Stock> getWeeklyStock() {
-        return weeklyStock;
+    public List<Stock> getDailyStockPrices() {
+        return dailyPrices;
     }
 
-    public void getWeeklyStock(List<Stock> weeklyStock) {
-        this.weeklyStock = weeklyStock;
+    public void setDailyPrices(List<Stock> dailyPrices) {
+        this.dailyPrices = dailyPrices;
     }
 }
 
