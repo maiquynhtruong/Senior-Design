@@ -2,26 +2,34 @@ version: 2
 jobs:
   build:
     docker:
-      # - image: circleci/python:3.4.9
-      - image: google/cloud-sdk:latest # to get Python3
+      # - image: circleci/python:latest
+      - image: google/cloud-sdk # to get Python3
     environment:
-      TRAIN_DATA:gs://$GOOGLE_BUCKET_NAME/Data
-      EVAL_DATA:gs://$GOOGLE_BUCKET_NAME/Data
-      RUNTIME_VERSION:1.4
-      PYTHON_VERSION:3.5
-      now:$(date +"%Y%m%d_%H%M%S")
-      JOB_NAME:stock_advisor_$now
-      OUTPUT_PATH:gs://$GOOGLE_BUCKET_NAME/$JOB_NAME
-      TRAINER_PACKAGE_PATH:"trainer/"
-      MAIN_TRAINER_MODULE:"trainer.task"
-      PACKAGE_STAGING_PATH:"gs://$GOOGLE_BUCKET_NAME"
-      MODEL_DIR:"pred_output/run_20190326-145225"
+      TRAIN_DATA=gs://$GOOGLE_BUCKET_NAME/Data
+      EVAL_DATA=gs://$GOOGLE_BUCKET_NAME/Data
+      RUNTIME_VERSION=1.4
+      PYTHON_VERSION=3.5
+      now=$(date +"%Y%m%d_%H%M%S")
+      JOB_NAME=stock_advisor_$now
+      OUTPUT_PATH=gs://$GOOGLE_BUCKET_NAME/$JOB_NAME
+      TRAINER_PACKAGE_PATH="trainer/"
+      MAIN_TRAINER_MODULE="trainer.task"
+      PACKAGE_STAGING_PATH="gs://$GOOGLE_BUCKET_NAME"
+      MODEL_DIR="success_pred_output/run_20190326-145225"
     steps:
       - checkout
       - run:
-          name: "Run training locally"
+          name: List files
           command:
-            gcloud ml-engine local train --module-name trainer.task --package-path trainer/ --job-dir $MODEL_DIR --
+            ls
+      - run:
+          name: Install dependencies
+          command:
+            pip install -r requirements.txt
+      - run:
+          name: Run training locally
+          command:
+            gcloud ml-engine local train --module-name trainer.task --package-path trainer/ --job-dir success_pred_output/run_20190326-145225 --
             --train-files $TRAIN_DATA/aapl.us.txt --eval-files $EVAL_DATA/aapl.us.txt --num-epochs 10 --num-samples 10
 
       # - run:˘

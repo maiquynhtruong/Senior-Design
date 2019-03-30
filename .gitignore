@@ -6,3 +6,5 @@ cloudml-samples-master/
 pred_output/
 .DS_Store
 trainer/__pycache__/
+.circleci/run-build-locally-circleci-api.sh
+android-stock-advisor/.idea/caches
