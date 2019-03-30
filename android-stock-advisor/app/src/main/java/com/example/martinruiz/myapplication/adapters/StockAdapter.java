@@ -21,7 +21,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> implements onSwipeListener {
-    private CityWeatherAdapter.ViewHolder target;
     List<Stock> stockList;
     private int layoutReference;
     private OnItemClickListener listener;
