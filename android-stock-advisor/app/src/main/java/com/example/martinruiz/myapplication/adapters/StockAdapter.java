@@ -7,10 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
+import android.support.v7.widget.CardView;
 import com.example.martinruiz.myapplication.R;
 import com.example.martinruiz.myapplication.interfaces.onSwipeListener;
 import com.example.martinruiz.myapplication.models.Stock;
+import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
@@ -20,7 +21,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> implements onSwipeListener {
-
+    private CityWeatherAdapter.ViewHolder target;
     List<Stock> stockList;
     private int layoutReference;
     private OnItemClickListener listener;
@@ -35,15 +36,15 @@ public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> 
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public StockAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         parentView = parent;
         View view = LayoutInflater.from(activity).inflate(layoutReference, parent, false);
         return null;
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-
+    public void onBindViewHolder(StockAdapter.ViewHolder holder, int position) {
+        holder.bind(stockList.get(position), listener);
     }
 
     @Override
@@ -63,21 +64,32 @@ public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> 
     };
 
     public void addItem(Stock stock, int position) {
-
+        stockList.add(position, stock);
+        notifyItemInserted(position);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.ticker_symbol) TextView tickerSymbol;
         @BindView(R.id.stock_name) TextView stockName;
         @BindView(R.id.stock_price) TextView stockPrice;
+        @BindView(R.id.cardViewStockCard) CardView cardViewStockCard;
 
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        public void bind(Stock stock) {
+        public void bind(Stock stock, final OnItemClickListener listener) {
+            stockName.setText(stock.getName());
+            stockPrice.setText(stock.getPrice() + "");
+            tickerSymbol.setText(stock.getTickerSymbol());
 
+            cardViewStockCard.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.onItemClick(stock,getAdapterPosition(), cardViewStockCard);
+                }
+            });
         }
     }
 
