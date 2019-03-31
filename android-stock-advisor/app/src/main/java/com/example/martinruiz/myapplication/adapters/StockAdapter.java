@@ -10,23 +10,21 @@ import android.widget.TextView;
 import android.support.v7.widget.CardView;
 import com.example.martinruiz.myapplication.R;
 import com.example.martinruiz.myapplication.interfaces.onSwipeListener;
-import com.example.martinruiz.myapplication.models.StockInfo;
-import com.example.martinruiz.myapplication.models.StockTimeSeries;
-
+import com.example.martinruiz.myapplication.models.StockQuote;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> implements onSwipeListener {
-    List<StockInfo> stockInfoList;
+    List<StockQuote> stockQuoteList;
     private int layoutReference;
     private OnItemClickListener listener;
     private Activity activity;
     private View parentView;
 
-    public StockAdapter(List<StockInfo> stockInfoList, int layoutReference, Activity activity, OnItemClickListener listener) {
-        this.stockInfoList = stockInfoList;
+    public StockAdapter(List<StockQuote> stockInfoList, int layoutReference, Activity activity, OnItemClickListener listener) {
+        this.stockQuoteList = stockInfoList;
         this.layoutReference = layoutReference;
         this.activity = activity;
         this.listener = listener;
@@ -41,7 +39,7 @@ public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(StockAdapter.ViewHolder holder, int position) {
-        holder.bind(stockInfoList.get(position), listener);
+        holder.bind(stockQuoteList.get(position), listener);
     }
 
     @Override
@@ -50,18 +48,16 @@ public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> 
     }
 
     public void onItemDelete(int poisition) {
-        StockInfo stockInfo = stockInfoList.get(poisition);
-        stockInfoList.remove(poisition);
+        StockQuote stockQuote = stockQuoteList.get(poisition);
+        stockQuoteList.remove(poisition);
         notifyItemRemoved(poisition);
 
         Snackbar.make(parentView, "Removed", Snackbar.LENGTH_LONG)
-                .setAction("Undo", v -> {
-                addItem(stockInfo, poisition);
-                }).show();
+                .setAction("Undo", v -> addItem(stockQuote, poisition)).show();
     };
 
-    public void addItem(StockInfo stockInfo, int position) {
-        stockInfoList.add(position, stockInfo);
+    public void addItem(StockQuote stockQuote, int position) {
+        stockQuoteList.add(position, stockQuote);
         notifyItemInserted(position);
     }
 
@@ -76,21 +72,21 @@ public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> 
             ButterKnife.bind(this, itemView);
         }
 
-        public void bind(StockInfo stockInfo, final OnItemClickListener listener) {
-            stockName.setText(stockInfo.getStockMetaData().getSymbol());
-            stockPrice.setText(stockInfo.getStockTimeSeries().getClose() + "");
-            tickerSymbol.setText(stockInfo.getStockMetaData().getSymbol());
+        public void bind(StockQuote stockQuote, final OnItemClickListener listener) {
+            stockName.setText(stockQuote.getStock().getSymbol());
+            stockPrice.setText(stockQuote.getStock().getClose());
+            tickerSymbol.setText(stockQuote.getStock().getSymbol());
 
             cardViewStockCard.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    listener.onItemClick(stockInfo,getAdapterPosition(), cardViewStockCard);
+                    listener.onItemClick(stockQuote,getAdapterPosition(), cardViewStockCard);
                 }
             });
         }
     }
 
     public interface OnItemClickListener {
-        void onItemClick(StockInfo stockInfo, int position, View view);
+        void onItemClick(StockQuote stockQuote, int position, View view);
     }
 }
