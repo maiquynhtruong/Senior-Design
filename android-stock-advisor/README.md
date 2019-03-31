@@ -23,7 +23,7 @@
 - Cities will be lost when you terminate the app process
 
 # Tested 
-- Nexus 6P running Android O 8.0 stock
+- Nexus 6P running Android O 8.0 stockTimeSeries
 
 ## Built With
 
