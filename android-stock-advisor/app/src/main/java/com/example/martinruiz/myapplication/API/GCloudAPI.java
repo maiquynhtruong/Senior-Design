@@ -49,18 +49,16 @@ public class GCloudAPI {
     static String versionId = "version1";
 
     public static String getTrend(String stockName) {
-        String trendIndicator = "aapl"; // Default stock name
-        try {
-            trendIndicator = getResponse(stockName);
-        } catch (Exception e) {
-            Log.i("getTrend - ", e.getMessage());
-        }
+        String trendIndicator = "-1"; // -1 is error
+        try { trendIndicator = getResponse(stockName); }
+        catch (Exception e) { Log.e("getTrend - ", e.getMessage()); }
+
         return trendIndicator;
     }
 
 
     public static String getResponse(String stockName) throws Exception{
-        HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+        HttpTransport httpTransport = new com.google.api.client.http.javanet.NetHttpTransport();
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
         Discovery discovery = new Discovery.Builder(httpTransport, jsonFactory, null).build();
 

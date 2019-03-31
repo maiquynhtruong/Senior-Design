@@ -48,14 +48,13 @@ public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> 
         return stockQuoteList.size();
     }
 
-    public void onItemDelete(int poisition) {
-        StockQuote stockQuote = stockQuoteList.get(poisition);
-        stockQuoteList.remove(poisition);
-        notifyItemRemoved(poisition);
+    public void onItemDelete(int position) {
+        StockQuote stockQuote = stockQuoteList.get(position);
+        stockQuoteList.remove(position);
+        notifyItemRemoved(position);
 
-        Snackbar.make(parentView, "Removed", Snackbar.LENGTH_LONG)
-                .setAction("Undo", v -> addItem(stockQuote, poisition)).show();
-    };
+        Snackbar.make(parentView, "Removed", Snackbar.LENGTH_LONG).setAction("Undo", v -> addItem(stockQuote, position)).show();
+    }
 
     public void addItem(StockQuote stockQuote, int position) {
         stockQuoteList.add(position, stockQuote);
@@ -75,15 +74,10 @@ public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> 
 
         public void bind(StockQuote stockQuote, final OnItemClickListener listener) {
             stockName.setText(stockQuote.getStock().getName());
-            stockPrice.setText(stockQuote.getStock().getPrice());
+            stockPrice.setText(String.format("$%s", stockQuote.getStock().getPrice()));
             tickerSymbol.setText(stockQuote.getStock().getSymbol());
 
-            cardViewStockCard.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    listener.onItemClick(stockQuote,getAdapterPosition(), cardViewStockCard);
-                }
-            });
+            cardViewStockCard.setOnClickListener(view -> listener.onItemClick(stockQuote,getAdapterPosition(), cardViewStockCard));
         }
     }
 

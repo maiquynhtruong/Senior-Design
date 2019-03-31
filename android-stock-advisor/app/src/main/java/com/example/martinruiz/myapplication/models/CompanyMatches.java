@@ -17,7 +17,7 @@ public class CompanyMatches implements Serializable {
     }
 
     public Company getBestMatchedCompany() {
-        if (companyList.isEmpty()) return null;
+        if (companyList == null || companyList.isEmpty()) return null;
         int bestIndex = 0;
         float bestMatchScore = 0f;
         for (int i = 0; i < companyList.size(); i++) {

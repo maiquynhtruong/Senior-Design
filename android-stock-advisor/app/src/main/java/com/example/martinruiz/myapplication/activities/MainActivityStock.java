@@ -162,6 +162,8 @@ public class MainActivityStock extends AppCompatActivity {
 
     protected void addStock(String stockName) {
         String stockTrend = GCloudAPI.getTrend(stockName);
+        Log.i("stockTrend", String.valueOf(stockTrend));
+
         Call<CompanyMatches> companyMatchesCall = stockServices.getCompanyMatches(API.ALPHA_VANTAGE_SYMBOL_SEARCH, stockName, getString(R.string.alpha_vantage_api_key));
         companyMatchesCall.enqueue(new Callback<CompanyMatches>() {
             @Override
@@ -228,7 +230,7 @@ public class MainActivityStock extends AppCompatActivity {
                     StockQuote stockQuote = response.body();
                     Log.e("AddStockResponse", new Gson().toJson(response.body()) );
 
-                    if (stockQuote == null) {
+                    if (stockQuote.getStock() == null) {
                         stockQuote.setStock(new Stock("UNKNOWN", "0"));
                         stockQuote.getStock().setName(getString(R.string.unknown_company));
                     } else {
