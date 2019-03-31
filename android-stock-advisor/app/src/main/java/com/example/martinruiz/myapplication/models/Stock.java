@@ -5,6 +5,32 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 public class Stock implements Serializable {
+    @SerializedName("01. symbol") private String symbol;
+    @SerializedName("02. open") private String open;
+    @SerializedName("03. high") private String high;
+    @SerializedName("04. low") private String low;
+    @SerializedName("05. price") private String price;
+    @SerializedName("06. volume") private String volume;
+    @SerializedName("07. latest trading day") private String latestTradingDay;
+    @SerializedName("08. previous price") private String previousClose;
+    @SerializedName("09. change") private String change;
+    @SerializedName("10. change percent") private String changePercent;
+
+    public Stock Stock(String symbol, String price) {
+        this.symbol = symbol;
+        this.price = price;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    private String name;
+
     public String getSymbol() {
         return symbol;
     }
@@ -84,15 +110,4 @@ public class Stock implements Serializable {
     public void setChangePercent(String changePercent) {
         this.changePercent = changePercent;
     }
-
-    @SerializedName("01. symbol") private String symbol;
-    @SerializedName("02. open") private String open;
-    @SerializedName("03. high") private String high;
-    @SerializedName("04. low") private String low;
-    @SerializedName("05. price") private String price;
-    @SerializedName("06. volume") private String volume;
-    @SerializedName("07. latest trading day") private String latestTradingDay;
-    @SerializedName("08. previous price") private String previousClose;
-    @SerializedName("09. change") private String change;
-    @SerializedName("10. change percent") private String changePercent;
 }

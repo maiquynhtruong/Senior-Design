@@ -2,8 +2,11 @@
     <string name="app_name">Stock Advisor</string>
     <string name="add_stock_title">ADD STOCK</string>
     <string name="add_stock_prompt">Type the ticker symbol of the stock you want to add</string>
+    <string name="company_name_not_found">Company Name not found. Please try again</string>
+    <string name="company_name_unavailable">Company Name lookup service is currently not available. Please try again shortly.</string>
     <string name="stock_not_found">Stock Name not found. Please try again</string>
     <string name="stock_service_unavailable">Stock service is currently not available. Please try again shortly</string>
+    <string name="unknown_company">Unknown Company</string>
     <string name="stock_unable_to_refresh">Stock list is unable to refresh. Please try again later</string>
     <string name="cancel">CANCEL</string>
     <string name="add_first_stock">Add your first stock</string>

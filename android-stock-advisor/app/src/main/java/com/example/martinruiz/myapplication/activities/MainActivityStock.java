@@ -26,6 +26,8 @@ import com.example.martinruiz.myapplication.API.APIServices.StockServices;
 import com.example.martinruiz.myapplication.R;
 import com.example.martinruiz.myapplication.adapters.StockAdapter;
 import com.example.martinruiz.myapplication.interfaces.onSwipeListener;
+import com.example.martinruiz.myapplication.models.Company;
+import com.example.martinruiz.myapplication.models.CompanyMatches;
 import com.example.martinruiz.myapplication.models.StockQuote;
 import com.example.martinruiz.myapplication.utils.ItemTouchHelperCallback;
 import com.google.gson.Gson;
@@ -157,18 +159,79 @@ public class MainActivityStock extends AppCompatActivity {
     }
 
     protected void addStock(String stockName) {
-        // Substitute alpha_vantage_api_key with your key
-        Call<StockQuote> stockRetrofit = stockServices.getStockPrice(API.ALPHA_VANTAGE_FUNCTION, stockName, getString(R.string.alpha_vantage_api_key));
 //        String stockTrend = GCloudAPI.getTrend(stockName);
+        Call<CompanyMatches> companyMatchesCall = stockServices.getCompanyMatches(API.ALPHA_VANTAGE_SYMBOL_SEARCH, stockName, getString(R.string.alpha_vantage_api_key));
+        List<Company> companyList = new ArrayList<>();
+        companyMatchesCall.enqueue(new Callback<CompanyMatches>() {
+            @Override
+            public void onResponse(Call<CompanyMatches> call, Response<CompanyMatches> response) {
+                if (response.code() == 200) {
+                    CompanyMatches matches = response.body();
+                    Company bestMatchedCompany = matches.getBestMatchedCompany();
+
+                    if (bestMatchedCompany != null) addToAdapter(stockName, bestMatchedCompany.getName());
+                    else addToAdapter(stockName, getString(R.string.unknown_company));
+
+                    Log.e("CompanyMatchesResponse:", new Gson().toJson(response.body()) );
+                } else {
+                    Toast.makeText(MainActivityStock.this, R.string.company_name_not_found, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CompanyMatches> call, Throwable t) {
+                Log.e("CompanyMatchesFailure:", t.getMessage());
+                Toast.makeText(MainActivityStock.this, R.string.company_name_unavailable, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    protected void updateStock(String stockName, int index) {
+        Call<CompanyMatches> companyMatchesCall = stockServices.getCompanyMatches(API.ALPHA_VANTAGE_SYMBOL_SEARCH, stockName, getString(R.string.alpha_vantage_api_key));
+
+        final Company[] company = {null};
+        companyMatchesCall.enqueue(new Callback<CompanyMatches>() {
+            @Override
+            public void onResponse(Call<CompanyMatches> call, Response<CompanyMatches> response) {
+                if (response.code() == 200) {
+                    CompanyMatches matches = response.body();
+                    Company bestMatchedCompany = matches.getBestMatchedCompany();
+
+                    if (bestMatchedCompany != null) updateAdapter(stockName, index, bestMatchedCompany.getName());
+                    else updateAdapter(stockName, index, getString(R.string.unknown_company));
+
+                    Log.e("CompanyMatchesResponse", new Gson().toJson(response.body()) );
+                } else {
+                    Toast.makeText(MainActivityStock.this, R.string.company_name_not_found, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CompanyMatches> call, Throwable t) {
+                Log.e("CompanyMatchesFailure", t.getMessage());
+                Toast.makeText(MainActivityStock.this, R.string.company_name_unavailable, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    List<StockQuote> getStocks() {
+        return new ArrayList<>();
+    }
+
+    void addToAdapter(String stockName, String companyName) {
+        Call<StockQuote> stockRetrofit = stockServices.getStockQuote(API.ALPHA_VANTAGE_QUOTE, stockName, getString(R.string.alpha_vantage_api_key));
         stockRetrofit.enqueue(new Callback<StockQuote>() {
             @Override
             public void onResponse(Call<StockQuote> call, Response<StockQuote> response) {
                 if (response.code() == 200) {
                     StockQuote stockQuote = response.body();
+                    Log.e("AddStockResponse", new Gson().toJson(response.body()) );
+
+                    stockQuote.getStock().setName(companyName);
                     stockQuoteList.add(stockQuote);
                     adapter.notifyItemInserted(stockQuoteList.size() - 1);
                     rvStock.scrollToPosition(stockQuoteList.size() - 1);
-                    Log.e("AddStockResponse:", new Gson().toJson(response.body()) );
+
                 } else {
                     Toast.makeText(MainActivityStock.this, R.string.stock_not_found, Toast.LENGTH_LONG).show();
                 }
@@ -176,19 +239,20 @@ public class MainActivityStock extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<StockQuote> call, Throwable t) {
-                Log.e("AddStockFailure:", t.getMessage());
+                Log.e("AddStockFailure", t.getMessage());
                 Toast.makeText(MainActivityStock.this, R.string.stock_service_unavailable, Toast.LENGTH_LONG).show();
             }
         });
     }
 
-    protected void updateStock(String stockName, int index) {
-        Call<StockQuote> stockRetrofit = stockServices.getStockPrice(API.ALPHA_VANTAGE_FUNCTION, stockName, getString(R.string.alpha_vantage_api_key));
+    void updateAdapter(String stockName, int index, String companyName) {
+        Call<StockQuote> stockRetrofit = stockServices.getStockQuote(API.ALPHA_VANTAGE_QUOTE, stockName, getString(R.string.alpha_vantage_api_key));
         stockRetrofit.enqueue(new Callback<StockQuote>() {
             @Override
             public void onResponse(Call<StockQuote> call, Response<StockQuote> response) {
                 if (response.code() == 200) {
                     StockQuote stockQuote = response.body();
+                    stockQuote.getStock().setName(companyName);
                     stockQuoteList.remove(index);
                     stockQuoteList.add(index, stockQuote);
                     adapter.notifyItemChanged(index);
@@ -204,9 +268,5 @@ public class MainActivityStock extends AppCompatActivity {
                 Toast.makeText(MainActivityStock.this, R.string.stock_service_unavailable, Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    List<StockQuote> getStocks() {
-        return new ArrayList<>();
     }
 }

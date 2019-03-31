@@ -9,7 +9,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class API {
     public static final String ALPHA_VANTAGE_BASE_URL = "https://www.alphavantage.co/";
-    public static final String ALPHA_VANTAGE_FUNCTION = "GLOBAL_QUOTE";
+    public static final String ALPHA_VANTAGE_QUOTE = "GLOBAL_QUOTE";
+    public static final String ALPHA_VANTAGE_SYMBOL_SEARCH = "SYMBOL_SEARCH";
     public static final String BASE_URL = "http://api.openweathermap.org/data/2.5/";
     public static final String KEY = "79badf94102e008963c2d50b6cfa43f2";
 

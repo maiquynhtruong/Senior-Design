@@ -5,14 +5,15 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 public class StockQuote implements Serializable {
+    @SerializedName("Global Quote") private Stock stock;
+
     public Stock getStock() {
+        if (stock == null) stock = new Stock();
         return stock;
     }
 
     public void setStock(Stock stock) {
         this.stock = stock;
     }
-
-    @SerializedName("Global Quote") private Stock stock;
 
 }
