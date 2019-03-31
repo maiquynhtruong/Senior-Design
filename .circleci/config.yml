@@ -19,6 +19,10 @@ jobs:
     steps:
       - checkout
       - run:
+        name: Setup Environment Variables
+        command: |
+          echo 'export CLOUDSDK_PYTHON=/usr/bin/python3.5' >> $BASH_ENV
+      - run:
           name: Python version
           command:
             python3 --version
@@ -26,8 +30,6 @@ jobs:
           name: Path to python3
           command:
             whereis python3
-          environment:
-            CLOUDSDK_PYTHON: python3
       - run:
           name: Install dependencies
           command:

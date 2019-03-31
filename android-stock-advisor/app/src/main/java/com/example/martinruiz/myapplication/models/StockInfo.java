@@ -2,9 +2,10 @@ package com.example.martinruiz.myapplication.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class StockInfo {
+public class StockInfo implements Serializable {
     public StockMetaData getStockMetaData() {
         return stockMetaData;
     }
@@ -13,11 +14,11 @@ public class StockInfo {
         this.stockMetaData = stockMetaData;
     }
 
-    public List<StockTimeSeries> getStockTimeSeries() {
+    public StockTimeSeries getStockTimeSeries() {
         return stockTimeSeries;
     }
 
-    public void setStockTimeSeries(List<StockTimeSeries> stockTimeSeries) {
+    public void setStockTimeSeries(StockTimeSeries stockTimeSeries) {
         this.stockTimeSeries = stockTimeSeries;
     }
 
@@ -25,7 +26,7 @@ public class StockInfo {
     private StockMetaData stockMetaData;
 
     @SerializedName("Time Series (5min)")
-    private List<StockTimeSeries> stockTimeSeries;
+    private StockTimeSeries stockTimeSeries;
 
 
 

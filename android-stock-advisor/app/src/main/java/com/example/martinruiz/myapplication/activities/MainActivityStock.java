@@ -68,13 +68,13 @@ public class MainActivityStock extends AppCompatActivity {
         stockServices = API.getApi().create(StockServices.class);
 
         layoutManager = new LinearLayoutManager(this);
-        adapter = new StockAdapter(stockInfoList, R.layout.stock_card, this, (stock, position, clickView) -> {
+        adapter = new StockAdapter(stockInfoList, R.layout.stock_card, this, (stockInfo, position, clickView) -> {
             Intent intent = new Intent(MainActivityStock.this, StockDetails.class);
             ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(
                     MainActivityStock.this, clickView,
                     "StockCardTransition");
 
-            intent.putExtra("stock",  stock);
+            intent.putExtra("stockInfo",  stockInfo);
             startActivity(intent,options.toBundle());
         });
 
@@ -161,7 +161,7 @@ public class MainActivityStock extends AppCompatActivity {
     protected void addStock(String stockName) {
         // Substitute alpha_vantage_api_key with your key
         Call<StockInfo> stockRetrofit = stockServices.getStockPrice(API.ALPHA_VANTAGE_FUNCTION, stockName, "5min", getString(R.string.alpha_vantage_api_key));
-        String stockTrend = GCloudAPI.getTrend(stockName);
+//        String stockTrend = GCloudAPI.getTrend(stockName);
         stockRetrofit.enqueue(new Callback<StockInfo>() {
             @Override
             public void onResponse(Call<StockInfo> call, Response<StockInfo> response) {
@@ -170,8 +170,7 @@ public class MainActivityStock extends AppCompatActivity {
                     stockInfoList.add(stockInfo);
                     adapter.notifyItemInserted(stockInfoList.size() - 1);
                     rvStock.scrollToPosition(stockInfoList.size() - 1);
-                    Log.e("TAG", "AddSTock: "+new Gson().toJson(response.body()) );
-
+                    Log.e("AddStockResponse:", new Gson().toJson(response.body()) );
                 } else {
                     Toast.makeText(MainActivityStock.this, R.string.stock_not_found, Toast.LENGTH_LONG).show();
                 }
@@ -179,6 +178,7 @@ public class MainActivityStock extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<StockInfo> call, Throwable t) {
+                Log.e("AddStockFailure:", t.getMessage());
                 Toast.makeText(MainActivityStock.this, R.string.stock_service_unavailable, Toast.LENGTH_LONG).show();
             }
         });

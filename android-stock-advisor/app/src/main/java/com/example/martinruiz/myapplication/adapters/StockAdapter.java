@@ -78,7 +78,7 @@ public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> 
 
         public void bind(StockInfo stockInfo, final OnItemClickListener listener) {
             stockName.setText(stockInfo.getStockMetaData().getSymbol());
-            stockPrice.setText(stockInfo.getStockTimeSeries().get(0).getClose() + "");
+            stockPrice.setText(stockInfo.getStockTimeSeries().getClose() + "");
             tickerSymbol.setText(stockInfo.getStockMetaData().getSymbol());
 
             cardViewStockCard.setOnClickListener(new View.OnClickListener() {
