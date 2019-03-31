@@ -17,7 +17,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> implements onSwipeListener {
-    List<StockQuote> stockQuoteList;
+    private List<StockQuote> stockQuoteList;
     private int layoutReference;
     private OnItemClickListener listener;
     private Activity activity;
@@ -34,7 +34,8 @@ public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> 
     public StockAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         parentView = parent;
         View view = LayoutInflater.from(activity).inflate(layoutReference, parent, false);
-        return null;
+        StockAdapter.ViewHolder viewHolder = new StockAdapter.ViewHolder(view);
+        return viewHolder;
     }
 
     @Override
@@ -44,7 +45,7 @@ public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return 0;
+        return stockQuoteList.size();
     }
 
     public void onItemDelete(int poisition) {
@@ -74,7 +75,7 @@ public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> 
 
         public void bind(StockQuote stockQuote, final OnItemClickListener listener) {
             stockName.setText(stockQuote.getStock().getSymbol());
-            stockPrice.setText(stockQuote.getStock().getClose());
+            stockPrice.setText(stockQuote.getStock().getPrice());
             tickerSymbol.setText(stockQuote.getStock().getSymbol());
 
             cardViewStockCard.setOnClickListener(new View.OnClickListener() {

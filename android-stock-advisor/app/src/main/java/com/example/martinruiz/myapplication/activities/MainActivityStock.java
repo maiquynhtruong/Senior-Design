@@ -23,11 +23,9 @@ import android.widget.Toast;
 
 import com.example.martinruiz.myapplication.API.API;
 import com.example.martinruiz.myapplication.API.APIServices.StockServices;
-import com.example.martinruiz.myapplication.API.GCloudAPI;
 import com.example.martinruiz.myapplication.R;
 import com.example.martinruiz.myapplication.adapters.StockAdapter;
 import com.example.martinruiz.myapplication.interfaces.onSwipeListener;
-import com.example.martinruiz.myapplication.models.StockInfo;
 import com.example.martinruiz.myapplication.models.StockQuote;
 import com.example.martinruiz.myapplication.utils.ItemTouchHelperCallback;
 import com.google.gson.Gson;

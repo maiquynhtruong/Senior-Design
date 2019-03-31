@@ -37,12 +37,12 @@ public class Stock implements Serializable {
         this.low = low;
     }
 
-    public String getClose() {
-        return close;
+    public String getPrice() {
+        return price;
     }
 
-    public void setClose(String close) {
-        this.close = close;
+    public void setPrice(String price) {
+        this.price = price;
     }
 
     public String getVolume() {
@@ -89,10 +89,10 @@ public class Stock implements Serializable {
     @SerializedName("02. open") private String open;
     @SerializedName("03. high") private String high;
     @SerializedName("04. low") private String low;
-    @SerializedName("05. close") private String close;
+    @SerializedName("05. price") private String price;
     @SerializedName("06. volume") private String volume;
     @SerializedName("07. latest trading day") private String latestTradingDay;
-    @SerializedName("08. previous close") private String previousClose;
+    @SerializedName("08. previous price") private String previousClose;
     @SerializedName("09. change") private String change;
     @SerializedName("10. change percent") private String changePercent;
 }
