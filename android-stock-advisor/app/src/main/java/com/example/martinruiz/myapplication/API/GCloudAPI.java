@@ -51,7 +51,7 @@ public class GCloudAPI {
     public static String getTrend(String stockName) {
         String trendIndicator = "aapl"; // Default stock name
         try {
-             trendIndicator = getResponse(stockName);
+            trendIndicator = getResponse(stockName);
         } catch (Exception e) {
             Log.i("getTrend - ", e.getMessage());
         }
@@ -69,11 +69,9 @@ public class GCloudAPI {
 
         JsonSchema param = new JsonSchema();
 
-        param.set(
-                "name", String.format("projects/%s/models/%s/versions/%s", projectId, modelId, versionId));
+        param.set("name", String.format("projects/%s/models/%s/versions/%s", projectId, modelId, versionId));
 
-        GenericUrl url =
-                new GenericUrl(UriTemplate.expand(api.getBaseUrl() + method.getPath(), param, true));
+        GenericUrl url = new GenericUrl(UriTemplate.expand(api.getBaseUrl() + method.getPath(), param, true));
         Log.i("GCloudAPI-url: ", url.toString());
 
         String contentType = "application/json";

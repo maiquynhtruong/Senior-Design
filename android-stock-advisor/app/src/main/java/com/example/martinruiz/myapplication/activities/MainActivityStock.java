@@ -23,11 +23,13 @@ import android.widget.Toast;
 
 import com.example.martinruiz.myapplication.API.API;
 import com.example.martinruiz.myapplication.API.APIServices.StockServices;
+import com.example.martinruiz.myapplication.API.GCloudAPI;
 import com.example.martinruiz.myapplication.R;
 import com.example.martinruiz.myapplication.adapters.StockAdapter;
 import com.example.martinruiz.myapplication.interfaces.onSwipeListener;
 import com.example.martinruiz.myapplication.models.Company;
 import com.example.martinruiz.myapplication.models.CompanyMatches;
+import com.example.martinruiz.myapplication.models.Stock;
 import com.example.martinruiz.myapplication.models.StockQuote;
 import com.example.martinruiz.myapplication.utils.ItemTouchHelperCallback;
 import com.google.gson.Gson;
@@ -159,9 +161,8 @@ public class MainActivityStock extends AppCompatActivity {
     }
 
     protected void addStock(String stockName) {
-//        String stockTrend = GCloudAPI.getTrend(stockName);
+        String stockTrend = GCloudAPI.getTrend(stockName);
         Call<CompanyMatches> companyMatchesCall = stockServices.getCompanyMatches(API.ALPHA_VANTAGE_SYMBOL_SEARCH, stockName, getString(R.string.alpha_vantage_api_key));
-        List<Company> companyList = new ArrayList<>();
         companyMatchesCall.enqueue(new Callback<CompanyMatches>() {
             @Override
             public void onResponse(Call<CompanyMatches> call, Response<CompanyMatches> response) {
@@ -227,7 +228,13 @@ public class MainActivityStock extends AppCompatActivity {
                     StockQuote stockQuote = response.body();
                     Log.e("AddStockResponse", new Gson().toJson(response.body()) );
 
-                    stockQuote.getStock().setName(companyName);
+                    if (stockQuote == null) {
+                        stockQuote.setStock(new Stock("UNKNOWN", "0"));
+                        stockQuote.getStock().setName(getString(R.string.unknown_company));
+                    } else {
+                        stockQuote.getStock().setName(companyName);
+                    }
+
                     stockQuoteList.add(stockQuote);
                     adapter.notifyItemInserted(stockQuoteList.size() - 1);
                     rvStock.scrollToPosition(stockQuoteList.size() - 1);

@@ -16,7 +16,9 @@ public class Stock implements Serializable {
     @SerializedName("09. change") private String change;
     @SerializedName("10. change percent") private String changePercent;
 
-    public Stock Stock(String symbol, String price) {
+    public Stock() {}
+
+    public Stock(String symbol, String price) {
         this.symbol = symbol;
         this.price = price;
     }
