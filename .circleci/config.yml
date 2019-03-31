@@ -19,13 +19,19 @@ jobs:
     steps:
       - checkout
       - run:
-          name: List files
+          name: Python version
           command:
-            ls
+            python3 --version
+      - run:
+          name: Path to python3
+          command:
+            whereis python3
+          environment:
+            CLOUDSDK_PYTHON: python3
       - run:
           name: Install dependencies
           command:
-            pip install -r requirements.txt
+            pip install -r requirements.txt --user
       - run:
           name: Run training locally
           command:
