@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.example.martinruiz.myapplication.R;
-import com.example.martinruiz.myapplication.models.Stock;
+import com.example.martinruiz.myapplication.models.StockTimeSeries;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -15,7 +15,7 @@ public class StockDetails extends AppCompatActivity {
     @BindView(R.id.ticker_symbol) TextView tvTickerSymbol;
     @BindView(R.id.stock_name) TextView tvStockName;
     @BindView(R.id.stock_price) TextView tvStockPrice;
-    private Stock stock;
+    private StockTimeSeries stockTimeSeries;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,15 +23,15 @@ public class StockDetails extends AppCompatActivity {
         setContentView(R.layout.activity_stock_details);
         ButterKnife.bind(this);
         Bundle bundle = getIntent().getExtras();
-        if(! bundle.isEmpty()){ stock = (Stock) bundle.getSerializable("stock"); }
+        if(! bundle.isEmpty()){ stockTimeSeries = (StockTimeSeries) bundle.getSerializable("stockTimeSeries"); }
 
         setCardData();
     }
 
     private void setCardData() {
-        tvTickerSymbol.setText(stock.getTickerSymbol());
-        tvStockName.setText(stock.getName());
-        tvStockPrice.setText("$" + stock.getPrice());
+        tvTickerSymbol.setText(stockTimeSeries.getTickerSymbol());
+        tvStockName.setText(stockTimeSeries.getName());
+        tvStockPrice.setText("$" + stockTimeSeries.getPrice());
 
     }
 }

@@ -2,7 +2,6 @@ package com.example.martinruiz.myapplication.activities;
 
 import android.app.ActivityOptions;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -24,12 +23,12 @@ import android.widget.Toast;
 
 import com.example.martinruiz.myapplication.API.API;
 import com.example.martinruiz.myapplication.API.APIServices.StockServices;
-import com.example.martinruiz.myapplication.API.APIServices.WeatherServices;
 import com.example.martinruiz.myapplication.API.GCloudAPI;
 import com.example.martinruiz.myapplication.R;
 import com.example.martinruiz.myapplication.adapters.StockAdapter;
 import com.example.martinruiz.myapplication.interfaces.onSwipeListener;
-import com.example.martinruiz.myapplication.models.Stock;
+import com.example.martinruiz.myapplication.models.StockInfo;
+import com.example.martinruiz.myapplication.models.StockTimeSeries;
 import com.example.martinruiz.myapplication.utils.ItemTouchHelperCallback;
 import com.google.gson.Gson;
 
@@ -45,7 +44,7 @@ import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
 
 public class MainActivityStock extends AppCompatActivity {
 
-    private List<Stock> stockList;
+    private List<StockInfo> stockInfoList;
     @BindView(R.id.fabAddStock) FloatingActionButton fabAddStock;
     @BindView(R.id.recycler_view_stock) RecyclerView rvStock;
     private RecyclerView.Adapter adapter;
@@ -63,13 +62,13 @@ public class MainActivityStock extends AppCompatActivity {
         getSupportActionBar().hide();
         ButterKnife.bind(this);
 
-        stockList = getStocks();
-        if (stockList.size() == 0) { showFabPrompt(); }
+        stockInfoList = getStocks();
+        if (stockInfoList.size() == 0) { showFabPrompt(); }
 
         stockServices = API.getApi().create(StockServices.class);
 
         layoutManager = new LinearLayoutManager(this);
-        adapter = new StockAdapter(stockList, R.layout.stock_card, this, (stock, position, clickView) -> {
+        adapter = new StockAdapter(stockInfoList, R.layout.stock_card, this, (stock, position, clickView) -> {
             Intent intent = new Intent(MainActivityStock.this, StockDetails.class);
             ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(
                     MainActivityStock.this, clickView,
@@ -128,8 +127,8 @@ public class MainActivityStock extends AppCompatActivity {
     }
 
     private void refreshData() {
-        for (int i = 0; i < stockList.size(); i++) {
-            updateStock(stockList.get(i).getName(), i);
+        for (int i = 0; i < stockInfoList.size(); i++) {
+            updateStock(stockInfoList.get(i).getStockMetaData().getSymbol(), i);
         }
         swipeRefreshLayout.setRefreshing(false);
     }
@@ -161,16 +160,16 @@ public class MainActivityStock extends AppCompatActivity {
 
     protected void addStock(String stockName) {
         // Substitute alpha_vantage_api_key with your key
-        Call<Stock> stockRetrofit = stockServices.getStockPrice(API.ALPHA_VANTAGE_FUNCTION, stockName, "5min", getString(R.string.alpha_vantage_api_key));
+        Call<StockInfo> stockRetrofit = stockServices.getStockPrice(API.ALPHA_VANTAGE_FUNCTION, stockName, "5min", getString(R.string.alpha_vantage_api_key));
         String stockTrend = GCloudAPI.getTrend(stockName);
-        stockRetrofit.enqueue(new Callback<Stock>() {
+        stockRetrofit.enqueue(new Callback<StockInfo>() {
             @Override
-            public void onResponse(Call<Stock> call, Response<Stock> response) {
+            public void onResponse(Call<StockInfo> call, Response<StockInfo> response) {
                 if (response.code() == 200) {
-                    Stock stock = response.body();
-                    stockList.add(stock);
-                    adapter.notifyItemInserted(stockList.size() - 1);
-                    rvStock.scrollToPosition(stockList.size() - 1);
+                    StockInfo stockInfo = response.body();
+                    stockInfoList.add(stockInfo);
+                    adapter.notifyItemInserted(stockInfoList.size() - 1);
+                    rvStock.scrollToPosition(stockInfoList.size() - 1);
                     Log.e("TAG", "AddSTock: "+new Gson().toJson(response.body()) );
 
                 } else {
@@ -179,21 +178,21 @@ public class MainActivityStock extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Stock> call, Throwable t) {
+            public void onFailure(Call<StockInfo> call, Throwable t) {
                 Toast.makeText(MainActivityStock.this, R.string.stock_service_unavailable, Toast.LENGTH_LONG).show();
             }
         });
     }
 
     protected void updateStock(String stockName, int index) {
-        Call<Stock> stockRetrofit = stockServices.getStockPrice(API.ALPHA_VANTAGE_FUNCTION, stockName, "5min", getString(R.string.alpha_vantage_api_key));
-        stockRetrofit.enqueue(new Callback<Stock>() {
+        Call<StockInfo> stockRetrofit = stockServices.getStockPrice(API.ALPHA_VANTAGE_FUNCTION, stockName, "5min", getString(R.string.alpha_vantage_api_key));
+        stockRetrofit.enqueue(new Callback<StockInfo>() {
             @Override
-            public void onResponse(Call<Stock> call, Response<Stock> response) {
+            public void onResponse(Call<StockInfo> call, Response<StockInfo> response) {
                 if (response.code() == 200) {
-                    Stock stock = response.body();
-                    stockList.remove(index);
-                    stockList.add(index, stock);
+                    StockInfo stockInfo = response.body();
+                    stockInfoList.remove(index);
+                    stockInfoList.add(index, stockInfo);
                     adapter.notifyItemChanged(index);
                     Log.e("TAG", "updateStock: "+new Gson().toJson(response.body()) );
                 } else {
@@ -202,13 +201,13 @@ public class MainActivityStock extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Stock> call, Throwable t) {
+            public void onFailure(Call<StockInfo> call, Throwable t) {
                 Toast.makeText(MainActivityStock.this, R.string.stock_service_unavailable, Toast.LENGTH_LONG).show();
             }
         });
     }
 
-    List<Stock> getStocks() {
+    List<StockInfo> getStocks() {
         return new ArrayList<>();
     }
 }
