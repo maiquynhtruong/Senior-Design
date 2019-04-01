@@ -1,0 +1,16 @@
+# Stock Advisor
+# Home page
+This is the home page of the app. The button below is to add another stock in the app.
+<img width="300" alt="1" src="https://user-images.githubusercontent.com/20506541/55293526-5fa7b580-53c5-11e9-823c-b996d741f93e.png">
+
+# How do you add a new stock in your app?
+Click the add button on the home page and input the symbol name of the stock. If the name doesn't exist, the app shows unknown stock.
+<img width="301" alt="2" src="https://user-images.githubusercontent.com/20506541/55293532-7948fd00-53c5-11e9-8ef0-b6462281ed37.png">
+
+# Stock list
+After you add a new stock on the app. The app shows the list of stocks you added so far. 
+<img width="299" alt="3" src="https://user-images.githubusercontent.com/20506541/55293537-80700b00-53c5-11e9-863b-7f5f95773d7a.png">
+
+# Contact Us
+truongmi@mail.uc.edu
+changy6@mail.uc.edu
