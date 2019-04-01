@@ -8,3 +8,4 @@ pred_output/
 trainer/__pycache__/
 .circleci/run-build-locally-circleci-api.sh
 android-stock-advisor/.idea/caches
+GCP_Credentials.json

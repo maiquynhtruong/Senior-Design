@@ -15,12 +15,11 @@ package com.example.martinruiz.myapplication.API;
  * limitations under the License.
  */
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.ByteArrayContent;
-import com.google.api.client.http.FileContent;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpContent;
 import com.google.api.client.http.HttpRequest;
@@ -33,55 +32,70 @@ import com.google.api.services.discovery.Discovery;
 import com.google.api.services.discovery.model.JsonSchema;
 import com.google.api.services.discovery.model.RestDescription;
 import com.google.api.services.discovery.model.RestMethod;
-import java.io.File;
 
 /*
  * Sample code for doing Cloud Machine Learning Engine online prediction in Java.
  */
 
-public class GCloudAPI {
+public class GCloudAPI extends AsyncTask<String, Integer, String> {
 
-    static String projectId = "fluid-mote-232300-mlengine";
+    static String projectId = "fluid-mote-232300"; //-mlengine";
     static String sourceURL = "https://storage.googleapis.com/"+ projectId + "/Data/";
     // You should have already deployed a model and a version.
     // For reference, see https://cloud.google.com/ml-engine/docs/deploying-models.
     static String modelId = "stock_advisor";
     static String versionId = "version1";
+    public static String trendIndicator = "-1"; // -1 is error
 
     public static String getTrend(String stockName) {
-        String trendIndicator = "-1"; // -1 is error
-        try { trendIndicator = getResponse(stockName); }
-        catch (Exception e) { Log.e("getTrend - ", e.getMessage()); }
+        new GCloudAPI().execute(stockName);
 
         return trendIndicator;
     }
 
 
-    public static String getResponse(String stockName) throws Exception{
+    protected String doInBackground(String... stockNames) {
         HttpTransport httpTransport = new com.google.api.client.http.javanet.NetHttpTransport();
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
         Discovery discovery = new Discovery.Builder(httpTransport, jsonFactory, null).build();
 
-        RestDescription api = discovery.apis().getRest("ml", "v1").execute();
-        RestMethod method = api.getResources().get("projects").getMethods().get("predict");
+        String stockName = stockNames[0];
 
-        JsonSchema param = new JsonSchema();
+        try {
+            RestDescription api = discovery.apis().getRest("ml", "v1").execute();
+            RestMethod method = api.getResources().get("projects").getMethods().get("predict");
 
-        param.set("name", String.format("projects/%s/models/%s/versions/%s", projectId, modelId, versionId));
+            JsonSchema param = new JsonSchema();
 
-        GenericUrl url = new GenericUrl(UriTemplate.expand(api.getBaseUrl() + method.getPath(), param, true));
-        Log.i("GCloudAPI-url: ", url.toString());
+            param.set("name", String.format("projects/%s/models/%s/versions/%s", projectId, modelId, versionId));
 
-        String contentType = "application/json";
-        String jsonInput = "{\"input_values\": [\"" + stockName + "\"]}";
-        HttpContent content = new ByteArrayContent(contentType, jsonInput.getBytes());
-        Log.i("GCloudAPI-content len:", "" + content.getLength());
+            GenericUrl url = new GenericUrl(UriTemplate.expand(api.getBaseUrl() + method.getPath(), param, true));
+            Log.i("GCloudAPI-url: ", url.toString());
 
-        GoogleCredential credential = GoogleCredential.getApplicationDefault();
-        HttpRequestFactory requestFactory = httpTransport.createRequestFactory(credential);
-        HttpRequest request = requestFactory.buildRequest(method.getHttpMethod(), url, content);
+            String contentType = "application/json";
+            String jsonInput = "{\"input_values\": [\"" + stockName + "\"]}";
+            HttpContent content = new ByteArrayContent(contentType, jsonInput.getBytes());
+            Log.i("GCloudAPI-content len:", "" + content.getLength());
 
-        String response = request.execute().parseAsString();
-        return response;
+            GoogleCredential credential = GoogleCredential.getApplicationDefault();
+            HttpRequestFactory requestFactory = httpTransport.createRequestFactory(credential);
+            HttpRequest request = requestFactory.buildRequest(method.getHttpMethod(), url, content);
+
+            String response = request.execute().parseAsString();
+            return response;
+        } catch (Exception e) {
+            Log.e("doInBackground", e.getMessage());
+            return "There was an error getting trend prediction. Please try again...";
+        }
+    }
+
+    // This is called each time you call publishProgress()
+    protected void onProgressUpdate(Integer... progress) {
+        Log.i("ProgressUpdate", String.valueOf(progress[0]));
+    }
+
+    // This is called when doInBackground() is finished
+    protected void onPostExecute(String result) {
+        trendIndicator = result;
     }
 }
