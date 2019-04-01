@@ -77,7 +77,7 @@ public class StockAdapter extends RecyclerView.Adapter<StockAdapter.ViewHolder> 
             stockPrice.setText(String.format("$%s", stockQuote.getStock().getPrice()));
             tickerSymbol.setText(stockQuote.getStock().getSymbol());
 
-            cardViewStockCard.setOnClickListener(view -> listener.onItemClick(stockQuote,getAdapterPosition(), cardViewStockCard));
+            cardViewStockCard.setOnClickListener(view -> listener.onItemClick(stockQuote, getAdapterPosition(), cardViewStockCard));
         }
     }
 

@@ -23,7 +23,7 @@ public class StockDetails extends AppCompatActivity {
         setContentView(R.layout.activity_stock_details);
         ButterKnife.bind(this);
         Bundle bundle = getIntent().getExtras();
-        if(! bundle.isEmpty()){ stockQuote = (StockQuote) bundle.getSerializable("stockInfo"); }
+        if(! bundle.isEmpty()){ stockQuote = (StockQuote) bundle.getSerializable("stockQuote"); }
 
         setCardData();
     }
