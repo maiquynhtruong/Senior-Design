@@ -31,7 +31,7 @@ public class StockDetails extends AppCompatActivity {
     private void setCardData() {
         tvTickerSymbol.setText(stockQuote.getStock().getSymbol());
         tvStockName.setText(stockQuote.getStock().getName());
-        tvStockPrice.setText(String.format("$%s", stockQuote.getStock().getPrice()));
+        tvStockPrice.setText(String.format("USD %s", stockQuote.getStock().getPrice()));
 
     }
 }
