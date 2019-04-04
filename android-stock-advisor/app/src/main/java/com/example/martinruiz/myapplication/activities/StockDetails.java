@@ -45,8 +45,8 @@ public class StockDetails extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (adviceShown) {
-                    appPrediction.setVisibility(View.INVISIBLE);
-                    appPredictionText.setVisibility(View.INVISIBLE);
+                    appPrediction.setVisibility(View.GONE);
+                    appPredictionText.setVisibility(View.GONE);
                     showAdviceButton.setText("Show Advice");
                 } else {
                     appPrediction.setVisibility(View.VISIBLE);
