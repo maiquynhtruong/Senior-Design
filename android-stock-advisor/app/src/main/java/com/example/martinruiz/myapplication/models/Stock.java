@@ -3,6 +3,7 @@ package com.example.martinruiz.myapplication.models;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
 public class Stock implements Serializable {
     @SerializedName("01. symbol") private String symbol;
@@ -15,12 +16,22 @@ public class Stock implements Serializable {
     @SerializedName("08. previous price") private String previousClose;
     @SerializedName("09. change") private String change;
     @SerializedName("10. change percent") private String changePercent;
+    private HashMap<String, Float> historicalData;
 
     public Stock() {}
 
     public Stock(String symbol, String price) {
         this.symbol = symbol;
         this.price = price;
+
+    }
+
+    public HashMap<String, Float> getHistoricalData() {
+        return historicalData;
+    }
+
+    public void setHistoricalData(HashMap<String, Float> historicalData) {
+        this.historicalData = historicalData;
     }
 
     public String getName() {
