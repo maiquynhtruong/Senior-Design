@@ -31,7 +31,7 @@
         android:id="@+id/user_prediction_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="20dp"
         android:background="@android:color/holo_blue_light"
         android:text="Your Prediction"
         android:textSize="@dimen/title_size"
@@ -54,25 +54,41 @@
         />
 
     <Button
+        android:id="@+id/submit_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/mybutton"
+        android:padding="10dp"
+        android:text="SUBMIT!"
+        android:textColor="#ffffff"
+        android:textSize="@dimen/button_size"
+        android:backgroundTint="@android:color/holo_red_light"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/user_prediction" />
+
+
+    <Button
         android:id="@+id/show_advice_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="24dp"
         android:background="@drawable/mybutton"
         android:padding="10dp"
         android:text="SHOW ADVICE"
         android:textColor="#ffffff"
-        android:textSize="20sp"
+        android:textSize="@dimen/button_size"
         android:backgroundTint="@android:color/holo_orange_dark"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/user_prediction" />
+        app:layout_constraintTop_toBottomOf="@id/submit_btn" />
 
     <TextView
         android:id="@+id/app_prediction_title"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="24dp"
         android:background="@android:color/holo_green_light"
         android:text="App's Prediction"
         android:textSize="25sp"
@@ -101,12 +117,12 @@
         android:id="@+id/show_prediction_stat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="24dp"
         android:background="@drawable/mybutton"
         android:padding="10dp"
         android:text="SHOW STATISTICS"
         android:textColor="#ffffff"
-        android:textSize="20sp"
+        android:textSize="@dimen/button_size"
         android:backgroundTint="@android:color/holo_green_light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -117,7 +133,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:background="@android:color/holo_red_light"
+        android:background="@android:color/holo_blue_bright"
         android:text="Coefficients"
         android:textSize="@dimen/title_size"
         android:textStyle="bold"
@@ -143,6 +159,6 @@
         android:id="@+id/prediction_chart"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/coefficient_title"/>
+        app:layout_constraintTop_toBottomOf="@id/coefficient_text"/>
 
 </android.support.constraint.ConstraintLayout>
