@@ -161,4 +161,5 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/coefficient_text"/>
 
+
 </android.support.constraint.ConstraintLayout>

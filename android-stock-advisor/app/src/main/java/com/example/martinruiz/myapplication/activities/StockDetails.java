@@ -75,13 +75,14 @@ public class StockDetails extends AppCompatActivity {
         });
 
         List<Entry> entries = new ArrayList<>();
-        for (int i = 0; i < entries.size(); i++) {
+        for (int i = 0; i < userData.length; i++) {
             entries.add(new Entry(i+1, (float) userData[i]));
         }
 
         LineDataSet dataSet = new LineDataSet(entries, "Label");
         dataSet.setColor(Color.RED);
         dataSet.setValueTextColor(Color.BLACK); // styling, ...
+
         LineData lineData = new LineData(dataSet);
         predictionChart.setData(lineData);
         predictionChart.invalidate(); // refresh
