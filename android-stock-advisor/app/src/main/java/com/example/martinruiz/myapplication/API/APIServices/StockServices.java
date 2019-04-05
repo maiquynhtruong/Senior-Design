@@ -1,5 +1,8 @@
 package com.example.martinruiz.myapplication.API.APIServices;
+import android.database.Observable;
+
 import com.example.martinruiz.myapplication.models.CompanyMatches;
+import com.example.martinruiz.myapplication.models.StockApiResponse;
 import com.example.martinruiz.myapplication.models.StockQuote;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -11,5 +14,10 @@ public interface StockServices {
 
     @GET("query")
     Call<StockQuote> getStockQuote(@Query("function") String functionName, @Query("symbol") String tickerSymbol, @Query("apikey") String apikey);
+
+    @GET("query")
+    Observable<StockApiResponse> getStockData(@Query("function") String functionName, @Query("symbol") String tickerSymbol,
+                                              @Query("interval") String interval, @Query("outputsize") String outputSize,
+                                              @Query("apikey") String apiKey);
 
 }
