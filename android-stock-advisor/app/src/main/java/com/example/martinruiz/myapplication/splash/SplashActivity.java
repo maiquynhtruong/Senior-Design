@@ -10,7 +10,6 @@ import android.transition.Explode;
 
 import com.example.martinruiz.myapplication.R;
 import com.example.martinruiz.myapplication.activities.MainActivityStock;
-import com.example.martinruiz.myapplication.activities.MainActivityWeather;
 import com.mikhaellopez.circularfillableloaders.CircularFillableLoaders;
 
 public class SplashActivity extends AppCompatActivity {
