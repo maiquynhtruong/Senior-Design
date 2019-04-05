@@ -103,7 +103,7 @@ public class StockDetails extends AppCompatActivity {
         dataSet2.setColor(Color.BLUE);
         dataSet2.setValueTextColor(Color.BLACK);
 
-        dataSet3.setColor(Color.YELLOW);
+        dataSet3.setColor(Color.GREEN);
         dataSet3.setValueTextColor(Color.BLACK);
 
 
