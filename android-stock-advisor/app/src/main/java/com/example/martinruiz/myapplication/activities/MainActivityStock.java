@@ -56,7 +56,6 @@ public class MainActivityStock extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
     @BindView(R.id.swipe_to_refresh) SwipeRefreshLayout swipeRefreshLayout;
     private MaterialTapTargetPrompt mFabPrompt;
-
     private StockServices stockServices;
 
     @Override
