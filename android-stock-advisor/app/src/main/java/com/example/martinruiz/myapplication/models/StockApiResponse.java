@@ -9,7 +9,7 @@ public class StockApiResponse {
     public MetaData metaData;
     @SerializedName("Time Series (Daily)")
     @Expose
-    public HashMap<String,StockData> timeSeries15min;
+    public HashMap<String, StockData> timeSeries15min;
     @Expose
     @SerializedName("Error Message")
     String errorMessage;

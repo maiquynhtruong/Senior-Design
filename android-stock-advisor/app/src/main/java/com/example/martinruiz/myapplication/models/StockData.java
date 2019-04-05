@@ -9,54 +9,54 @@ import com.google.gson.annotations.SerializedName;
 public class StockData {
 
     @SerializedName("1. open")
-    Double open;
+    Float open;
     @SerializedName("2. high")
-    Double high;
+    Float high;
     @SerializedName("3. low")
-    Double low;
+    Float low;
     @SerializedName("4. close")
-    Double close;
+    Float close;
     @SerializedName("5. volume")
-    Double volume;
+    Float volume;
 
 
-    public Double getOpen() {
+    public Float getOpen() {
         return open;
     }
 
-    public void setOpen(Double open) {
+    public void setOpen(Float open) {
         this.open = open;
     }
 
-    public Double getHigh() {
+    public Float getHigh() {
         return high;
     }
 
-    public void setHigh(Double high) {
+    public void setHigh(Float high) {
         this.high = high;
     }
 
-    public Double getLow() {
+    public Float getLow() {
         return low;
     }
 
-    public void setLow(Double low) {
+    public void setLow(Float low) {
         this.low = low;
     }
 
-    public Double getClose() {
+    public Float getClose() {
         return close;
     }
 
-    public void setClose(Double close) {
+    public void setClose(Float close) {
         this.close = close;
     }
 
-    public Double getVolume() {
+    public Float getVolume() {
         return volume;
     }
 
-    public void setVolume(Double volume) {
+    public void setVolume(Float volume) {
         this.volume = volume;
     }
 }

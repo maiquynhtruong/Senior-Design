@@ -3,6 +3,7 @@ package com.example.martinruiz.myapplication.activities;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Observable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -30,11 +31,13 @@ import com.example.martinruiz.myapplication.interfaces.onSwipeListener;
 import com.example.martinruiz.myapplication.models.Company;
 import com.example.martinruiz.myapplication.models.CompanyMatches;
 import com.example.martinruiz.myapplication.models.Stock;
+import com.example.martinruiz.myapplication.models.StockApiResponse;
 import com.example.martinruiz.myapplication.models.StockQuote;
 import com.example.martinruiz.myapplication.utils.ItemTouchHelperCallback;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -172,8 +175,10 @@ public class MainActivityStock extends AppCompatActivity {
                     CompanyMatches matches = response.body();
                     Company bestMatchedCompany = matches.getBestMatchedCompany();
 
-                    if (bestMatchedCompany != null) addToAdapter(stockName, bestMatchedCompany.getName());
-                    else addToAdapter(stockName, getString(R.string.unknown_company));
+                    if (bestMatchedCompany != null)
+                        addToAdapter(stockName, bestMatchedCompany.getName());
+                    else
+                        addToAdapter(stockName, getString(R.string.unknown_company));
 
                     Log.e("CompanyMatchesResponse:", new Gson().toJson(response.body()) );
                 } else {
@@ -234,9 +239,11 @@ public class MainActivityStock extends AppCompatActivity {
                         stockQuote.setStock(new Stock("UNKNOWN", "0"));
                         stockQuote.getStock().setName(getString(R.string.unknown_company));
                     } else {
+                        stockQuote.getStock().setSymbol(stockName);
                         stockQuote.getStock().setName(companyName);
                     }
 
+                    getHistoricalData(stockQuote.getStock());
                     stockQuoteList.add(stockQuote);
                     adapter.notifyItemInserted(stockQuoteList.size() - 1);
                     rvStock.scrollToPosition(stockQuoteList.size() - 1);
@@ -274,6 +281,34 @@ public class MainActivityStock extends AppCompatActivity {
             @Override
             public void onFailure(Call<StockQuote> call, Throwable t) {
                 Log.e("updateStockFailure", t.getMessage());
+                Toast.makeText(MainActivityStock.this, R.string.stock_service_unavailable, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    void getHistoricalData(Stock stock) {
+        Call<StockApiResponse> stockRetrofit = stockServices.getStockData(API.ALPHA_VANTAGE_DAILY, stock.getSymbol(), getString(R.string.alpha_vantage_api_key));
+
+        stockRetrofit.enqueue(new Callback<StockApiResponse>() {
+            @Override
+            public void onResponse(Call<StockApiResponse> call, Response<StockApiResponse> response) {
+                if (response.code() == 200) {
+                    StockApiResponse stockApiResponse = response.body();
+                    Log.e("GetHistoricalData", new Gson().toJson(response.body()));
+
+                    HashMap<String, Float> stockDatePriceMap = new HashMap<>();
+                    for (String key : stockApiResponse.getTimeSeries15min().keySet())
+                        stockDatePriceMap.put(key, stockApiResponse.getTimeSeries15min().get(key).getClose());
+                    stock.setHistoricalData(stockDatePriceMap);
+
+                } else {
+                    Toast.makeText(MainActivityStock.this, R.string.stock_not_found, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<StockApiResponse> call, Throwable t) {
+                Log.e("AddStockFailure", t.getMessage());
                 Toast.makeText(MainActivityStock.this, R.string.stock_service_unavailable, Toast.LENGTH_LONG).show();
             }
         });
