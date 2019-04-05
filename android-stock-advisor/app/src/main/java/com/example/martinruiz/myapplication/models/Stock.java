@@ -16,6 +16,16 @@ public class Stock implements Serializable {
     @SerializedName("08. previous price") private String previousClose;
     @SerializedName("09. change") private String change;
     @SerializedName("10. change percent") private String changePercent;
+
+    public String getLastUpdatedDate() {
+        return lastUpdatedDate;
+    }
+
+    public void setLastUpdatedDate(String lastUpdatedDate) {
+        this.lastUpdatedDate = lastUpdatedDate;
+    }
+
+    private String lastUpdatedDate;
     private HashMap<String, Float> historicalData;
 
     public Stock() {}

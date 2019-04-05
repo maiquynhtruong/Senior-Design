@@ -2,8 +2,8 @@ package com.example.martinruiz.myapplication.activities;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,15 +13,17 @@ import com.example.martinruiz.myapplication.R;
 import com.example.martinruiz.myapplication.models.PredictionData;
 import com.example.martinruiz.myapplication.models.Stock;
 import com.example.martinruiz.myapplication.models.StockQuote;
+import com.example.martinruiz.myapplication.utils.DateUtils;
+import com.example.martinruiz.myapplication.utils.StringUtils;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IFillFormatter;
+import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.google.api.client.util.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -110,16 +112,15 @@ public class StockDetails extends AppCompatActivity {
 
 
         Description description = new Description();
-        description.setText(StringUtils.getString(R.string.stock_history));
+        description.setText("Stock price history");
         lineChart.setDescription(description);
 
 
-        LineDataSet lineDataSet = new LineDataSet(Arrays.asList(entries), StringUtils.getString(R.string.stock_price));
+        LineDataSet lineDataSet = new LineDataSet(Arrays.asList(entries), "Stock price");
 
         lineChart.getAxisRight().setEnabled(false);
 
         lineChart.getXAxis().setValueFormatter((value, axis) -> {
-            Timber.d("x value for  " + value + " is " + xAxisValueToTextMap.get((int) value));
             return xAxisValueToTextMap.get((int) value);
         });
 
@@ -154,8 +155,8 @@ public class StockDetails extends AppCompatActivity {
         lineChart.setVisibleXRangeMaximum(10);
         lineChart.moveViewToX(100);
         lineChart.setScaleX(1);
-        lineDataSet.setColor(ContextCompat.getColor(StockTrackerApp.getContext(), R.color.holo_orange_dark));
-        lineDataSet.setFillColor(ContextCompat.getColor(StockTrackerApp.getContext(), R.color.holo_orange_dark));
+        lineDataSet.setColor(Color.rgb(244,125,66));
+        lineDataSet.setFillColor(Color.rgb(244,125,66));
 
     }
 }
