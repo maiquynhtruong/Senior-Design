@@ -1,5 +1,6 @@
 package com.example.martinruiz.myapplication.activities;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -8,7 +9,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.martinruiz.myapplication.R;
+import com.example.martinruiz.myapplication.models.PredictionData;
 import com.example.martinruiz.myapplication.models.StockQuote;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -21,9 +30,14 @@ public class StockDetails extends AppCompatActivity {
     @BindView(R.id.user_prediction) EditText etUserPredict;
     @BindView(R.id.show_advice_btn) Button showAdviceButton;
     @BindView(R.id.app_prediction) TextView appPrediction;
-    @BindView(R.id.app_prediction_text) TextView appPredictionText;
+    @BindView(R.id.app_prediction_title) TextView appPredictionText;
+    @BindView(R.id.prediction_chart) LineChart predictionChart;
     private StockQuote stockQuote;
     static boolean adviceShown = false;
+
+    private double[] userData;
+    private PredictionData appData;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +47,9 @@ public class StockDetails extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if(! bundle.isEmpty()){ stockQuote = (StockQuote) bundle.getSerializable("stockQuote"); }
         adviceShown = false;
+
+        userData = PredictionData.testArray3;
+
         setCardData();
     }
 
@@ -56,6 +73,18 @@ public class StockDetails extends AppCompatActivity {
                 adviceShown = !adviceShown;
             }
         });
-    }
 
+        List<Entry> entries = new ArrayList<>();
+        for (int i = 0; i < entries.size(); i++) {
+            entries.add(new Entry(i+1, (float) userData[i]));
+        }
+
+        LineDataSet dataSet = new LineDataSet(entries, "Label");
+        dataSet.setColor(Color.RED);
+        dataSet.setValueTextColor(Color.BLACK); // styling, ...
+        LineData lineData = new LineData(dataSet);
+        predictionChart.setData(lineData);
+        predictionChart.invalidate(); // refresh
+
+    }
 }
