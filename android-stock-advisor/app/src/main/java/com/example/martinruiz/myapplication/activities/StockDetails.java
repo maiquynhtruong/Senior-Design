@@ -12,9 +12,11 @@ import com.example.martinruiz.myapplication.R;
 import com.example.martinruiz.myapplication.models.PredictionData;
 import com.example.martinruiz.myapplication.models.StockQuote;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,8 @@ public class StockDetails extends AppCompatActivity {
     static boolean adviceShown = false;
 
     private double[] userData;
+    private double[] MLData;
+    private double[] realData;
     private PredictionData appData;
 
 
@@ -48,7 +52,10 @@ public class StockDetails extends AppCompatActivity {
         if(! bundle.isEmpty()){ stockQuote = (StockQuote) bundle.getSerializable("stockQuote"); }
         adviceShown = false;
 
-        userData = PredictionData.testArray3;
+        userData = PredictionData.userPreditions;
+        MLData = PredictionData.MLPreditions;
+        realData = PredictionData.realPrices;
+
 
         setCardData();
     }
@@ -75,15 +82,37 @@ public class StockDetails extends AppCompatActivity {
         });
 
         List<Entry> entries = new ArrayList<>();
+        List<Entry> entries2 = new ArrayList<>();
+        List<Entry> entries3 = new ArrayList<>();
         for (int i = 0; i < userData.length; i++) {
             entries.add(new Entry(i+1, (float) userData[i]));
+            entries2.add(new Entry(i+1, (float) MLData[i]));
+            entries3.add(new Entry(i+1, (float) realData[i]));
         }
 
-        LineDataSet dataSet = new LineDataSet(entries, "Label");
-        dataSet.setColor(Color.RED);
-        dataSet.setValueTextColor(Color.BLACK); // styling, ...
+        LineDataSet dataSet = new LineDataSet(entries, "user prediction");
+        dataSet.setAxisDependency((YAxis.AxisDependency.LEFT));
+        LineDataSet dataSet2 = new LineDataSet(entries2, "ML prediction");
+        dataSet.setAxisDependency((YAxis.AxisDependency.LEFT));
+        LineDataSet dataSet3 = new LineDataSet(entries3, "price");
+        dataSet.setAxisDependency((YAxis.AxisDependency.LEFT));
 
-        LineData lineData = new LineData(dataSet);
+        dataSet.setColor(Color.RED);
+        dataSet.setValueTextColor(Color.BLACK);
+
+        dataSet2.setColor(Color.BLUE);
+        dataSet2.setValueTextColor(Color.BLACK);
+
+        dataSet3.setColor(Color.YELLOW);
+        dataSet3.setValueTextColor(Color.BLACK);
+
+
+        List<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
+        dataSets.add(dataSet);
+        dataSets.add(dataSet2);
+        dataSets.add(dataSet3);
+
+        LineData lineData = new LineData(dataSets);
         predictionChart.setData(lineData);
         predictionChart.invalidate(); // refresh
 
