@@ -116,7 +116,7 @@ public class MainActivityStock extends AppCompatActivity {
 
         mFabPrompt = new MaterialTapTargetPrompt.Builder(MainActivityStock.this)
                 .setTarget(findViewById(R.id.fabAddStock))
-                .setFocalPadding(R.dimen.dp40)
+                .setFocalPadding(R.dimen.std_padding)
                 .setPrimaryText(R.string.add_first_stock)
                 .setSecondaryText(R.string.stock_updates)
                 .setBackButtonDismissEnabled(true)

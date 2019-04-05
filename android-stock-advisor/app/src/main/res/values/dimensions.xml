@@ -2,4 +2,5 @@
 <resources>
     <dimen name="text_size">30sp</dimen>
     <dimen name="title_size">20sp</dimen>
+    <dimen name="std_padding">40dp</dimen>
 </resources>

@@ -138,7 +138,7 @@ public class MainActivityWeather extends AppCompatActivity {
         }
         mFabPrompt = new MaterialTapTargetPrompt.Builder(MainActivityWeather.this)
                 .setTarget(findViewById(R.id.fabAddCity))
-                .setFocalPadding(R.dimen.dp40)
+                .setFocalPadding(R.dimen.std_padding)
                 .setPrimaryText("Add your first City")
                 .setSecondaryText("Tap the add button and add your favorites cities to get weather updates")
                 .setBackButtonDismissEnabled(true)
