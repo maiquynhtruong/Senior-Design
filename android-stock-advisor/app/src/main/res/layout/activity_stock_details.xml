@@ -136,23 +136,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:stretchColumns="1">
+            android:stretchColumns="1" >
             <TableRow>
-                <TextView />
-                <TextView android:text="User" android:gravity="center"/>
-                <TextView android:text="Stock Advisor" android:gravity="center"/>
+                <TextView android:background="@color/google_yellow" android:layout_margin="3dp"/>
+                <TextView android:text="User" android:gravity="center" android:background="@color/google_yellow" android:layout_margin="3dp"/>
+                <TextView android:text="Stock Advisor" android:gravity="center" android:background="@color/google_yellow" android:layout_margin="3dp"/>
             </TableRow>
 
             <TableRow>
-                <TextView android:text="Mean Squared Errors"/>
-                <TextView android:text="1" android:gravity="center"/>
-                <TextView android:text="2" android:gravity="center"/>
+                <TextView android:text="Mean Squared Errors" android:background="@color/google_yellow" android:layout_margin="3dp"/>
+                <TextView android:text="1" android:gravity="center" android:background="@color/cardview_shadow_start_color" android:layout_margin="3dp"/>
+                <TextView android:text="2" android:gravity="center" android:background="@color/cardview_shadow_start_color" android:layout_margin="3dp"/>
             </TableRow>
 
             <TableRow>
-                <TextView android:text="Correlation coefficients"/>
-                <TextView android:text="1" android:gravity="center"/>
-                <TextView android:text="2" android:gravity="center"/>
+                <TextView android:text="Correlation coefficients" android:background="@color/google_yellow" android:layout_margin="3dp"/>
+                <TextView android:text="1" android:gravity="center" android:background="@color/cardview_shadow_start_color" android:layout_margin="3dp"/>
+                <TextView android:text="2" android:gravity="center" android:background="@color/cardview_shadow_start_color" android:layout_margin="3dp"/>
             </TableRow>
         </TableLayout>
 
