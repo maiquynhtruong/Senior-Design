@@ -1,9 +1,8 @@
 package com.example.martinruiz.myapplication.API.APIServices;
-import android.database.Observable;
-
 import com.example.martinruiz.myapplication.models.CompanyMatches;
 import com.example.martinruiz.myapplication.models.StockApiResponse;
 import com.example.martinruiz.myapplication.models.StockQuote;
+
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;

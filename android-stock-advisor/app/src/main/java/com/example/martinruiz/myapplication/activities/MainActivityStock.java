@@ -3,7 +3,6 @@ package com.example.martinruiz.myapplication.activities;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Observable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;

@@ -28,12 +28,9 @@ public class Stock implements Serializable {
     private String lastUpdatedDate;
     private HashMap<String, Float> historicalData;
 
-    public Stock() {}
-
     public Stock(String symbol, String price) {
         this.symbol = symbol;
         this.price = price;
-
     }
 
     public HashMap<String, Float> getHistoricalData() {

@@ -2,7 +2,6 @@ package com.example.martinruiz.myapplication.activities;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -10,26 +9,19 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.martinruiz.myapplication.R;
-import com.example.martinruiz.myapplication.models.PredictionData;
 import com.example.martinruiz.myapplication.models.Stock;
 import com.example.martinruiz.myapplication.models.StockQuote;
 import com.example.martinruiz.myapplication.utils.DateUtils;
-import com.example.martinruiz.myapplication.utils.StringUtils;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IFillFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -44,13 +36,10 @@ public class StockDetails extends AppCompatActivity {
     @BindView(R.id.app_prediction) TextView appPrediction;
     @BindView(R.id.app_prediction_title) TextView appPredictionText;
     @BindView(R.id.prediction_chart) LineChart lineChart;
+    @BindView(R.id.show_prediction_stat) Button showStatButton;
     private StockQuote stockQuote;
     static boolean adviceShown = false;
-
-
-    private List<Float> userData;
-    private List<Float> MLData;
-    private List<Float> realData;
+    static boolean statShown = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +48,10 @@ public class StockDetails extends AppCompatActivity {
         ButterKnife.bind(this);
         Bundle bundle = getIntent().getExtras();
         if(! bundle.isEmpty()){ stockQuote = (StockQuote) bundle.getSerializable("stockQuote"); }
+
         adviceShown = false;
+        statShown = false;
+
         setCardData();
     }
 
@@ -68,21 +60,32 @@ public class StockDetails extends AppCompatActivity {
         tvStockName.setText(stockQuote.getStock().getName());
         tvStockPrice.setText(String.format("USD %s", stockQuote.getStock().getPrice()));
         String userPrediction = etUserPredict.getText().toString();
-        showAdviceButton.setOnClickListener(new View.OnClickListener() {
+
+        showAdviceButton.setOnClickListener(v -> {
+            if (adviceShown) {
+                appPrediction.setVisibility(View.GONE);
+                appPredictionText.setVisibility(View.GONE);
+                showAdviceButton.setText("Show Advice");
+            } else {
+                appPrediction.setVisibility(View.VISIBLE);
+                appPredictionText.setVisibility(View.VISIBLE);
+                showAdviceButton.setText("Close Advice");
+            }
+            adviceShown = !adviceShown;
+        });
+
+        showStatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (adviceShown) {
-                    appPrediction.setVisibility(View.GONE);
-                    appPredictionText.setVisibility(View.GONE);
-                    showAdviceButton.setText("Show Advice");
+                if (statShown) {
+
                 } else {
-                    appPrediction.setVisibility(View.VISIBLE);
-                    appPredictionText.setVisibility(View.VISIBLE);
-                    showAdviceButton.setText("Close Advice");
+
                 }
-                adviceShown = !adviceShown;
+                statShown = !statShown;
             }
         });
+
         drawGraph(stockQuote.getStock());
     }
 
@@ -99,7 +102,7 @@ public class StockDetails extends AppCompatActivity {
         String key = stock.getLastUpdatedDate();
         while (index >= 0) {
             if (stock.getHistoricalData().containsKey(key)) {
-                entries[index] = new Entry(index, stock.getHistoricalData().get(key).floatValue());
+                entries[index] = new Entry(index, stock.getHistoricalData().get(key));
                 xAxisValueToTextMap.put(index, key);
                 index--;
             }
@@ -138,12 +141,7 @@ public class StockDetails extends AppCompatActivity {
         lineDataSet.setFillColor(Color.WHITE);
         lineDataSet.setFillAlpha(100);
         lineDataSet.setDrawHorizontalHighlightIndicator(false);
-        lineDataSet.setFillFormatter(new IFillFormatter() {
-            @Override
-            public float getFillLinePosition(ILineDataSet dataSet, LineDataProvider dataProvider) {
-                return -10;
-            }
-        });
+        lineDataSet.setFillFormatter((dataSet, dataProvider) -> -10);
 
         // create a data object with the datasets
         LineData data = new LineData(lineDataSet);

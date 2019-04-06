@@ -123,13 +123,39 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="@android:color/holo_blue_bright"
-            android:text="Coefficients"
+            android:text="Statistics"
             android:textSize="@dimen/title_size"
             android:textStyle="bold"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
             android:gravity="center"
             />
+
+        <TableLayout
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:stretchColumns="1">
+            <TableRow>
+                <TextView />
+                <TextView android:text="User" android:gravity="center"/>
+                <TextView android:text="Stock Advisor" android:gravity="center"/>
+            </TableRow>
+
+            <TableRow>
+                <TextView android:text="Mean Squared Errors"/>
+                <TextView android:text="1" android:gravity="center"/>
+                <TextView android:text="2" android:gravity="center"/>
+            </TableRow>
+
+            <TableRow>
+                <TextView android:text="Correlation coefficients"/>
+                <TextView android:text="1" android:gravity="center"/>
+                <TextView android:text="2" android:gravity="center"/>
+            </TableRow>
+        </TableLayout>
+
 
         <EditText
             android:id="@+id/coefficient_text"
