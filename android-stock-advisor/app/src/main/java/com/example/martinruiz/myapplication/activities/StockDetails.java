@@ -89,6 +89,11 @@ public class StockDetails extends AppCompatActivity {
         drawGraph(stockQuote.getStock());
     }
 
+    private List<Float> getUserPredction (Stock stock) {
+        List<Float> hsdta = stock.getHistoricalData();
+        return stockQuote.createRandomList(hsdata);
+    }
+
     private void drawGraph(Stock stock) {
         if (stock.getHistoricalData() == null || stock.getHistoricalData().size() == 0 || lineChart == null) {
             return;
