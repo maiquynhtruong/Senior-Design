@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.example.martinruiz.myapplication.R;
@@ -35,8 +36,12 @@ public class StockDetails extends AppCompatActivity {
     @BindView(R.id.show_advice_btn) Button showAdviceButton;
     @BindView(R.id.app_prediction) TextView appPrediction;
     @BindView(R.id.app_prediction_title) TextView appPredictionText;
-    @BindView(R.id.prediction_chart) LineChart lineChart;
     @BindView(R.id.show_prediction_stat) Button showStatButton;
+    @BindView(R.id.state_title) TextView tvStatTitle;
+    @BindView(R.id.stat_table) TableLayout tlStatTable;
+    @BindView(R.id.graph_title) TextView tvGraphTitle;
+    @BindView(R.id.prediction_chart) LineChart lineChart;
+
     private StockQuote stockQuote;
     static boolean adviceShown = false;
     static boolean statShown = false;
@@ -61,32 +66,41 @@ public class StockDetails extends AppCompatActivity {
         tvStockPrice.setText(String.format("USD %s", stockQuote.getStock().getPrice()));
         String userPrediction = etUserPredict.getText().toString();
 
+        setButtons();
+        drawGraph(stockQuote.getStock());
+    }
+
+    private void setButtons() {
         showAdviceButton.setOnClickListener(v -> {
             if (adviceShown) {
                 appPrediction.setVisibility(View.GONE);
                 appPredictionText.setVisibility(View.GONE);
-                showAdviceButton.setText("Show Advice");
+                showAdviceButton.setText("SHOW ADVICE");
             } else {
                 appPrediction.setVisibility(View.VISIBLE);
                 appPredictionText.setVisibility(View.VISIBLE);
-                showAdviceButton.setText("Close Advice");
+                showAdviceButton.setText("CLOSE ADVICE");
             }
             adviceShown = !adviceShown;
         });
 
-        showStatButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (statShown) {
+        showStatButton.setOnClickListener(v -> {
+            if (statShown) {
+                tvStatTitle.setVisibility(View.GONE);
+                tlStatTable.setVisibility(View.GONE);
+                tvGraphTitle.setVisibility(View.GONE);
+                lineChart.setVisibility(View.GONE);
+                showStatButton.setText("SHOW STATISTICS ");
+            } else {
+                tvStatTitle.setVisibility(View.GONE);
+                tlStatTable.setVisibility(View.GONE);
+                tvGraphTitle.setVisibility(View.GONE);
+                lineChart.setVisibility(View.GONE);
+                showStatButton.setText("CLOSE STATISTICS");
 
-                } else {
-
-                }
-                statShown = !statShown;
             }
+            statShown = !statShown;
         });
-
-        drawGraph(stockQuote.getStock());
     }
 
     private void drawGraph(Stock stock) {
