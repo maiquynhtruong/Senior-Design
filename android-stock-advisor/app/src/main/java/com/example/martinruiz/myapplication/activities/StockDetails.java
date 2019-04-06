@@ -58,6 +58,7 @@ public class StockDetails extends AppCompatActivity {
         statShown = false;
 
         setCardData();
+        setButtons();
     }
 
     private void setCardData() {
@@ -66,7 +67,6 @@ public class StockDetails extends AppCompatActivity {
         tvStockPrice.setText(String.format("USD %s", stockQuote.getStock().getPrice()));
         String userPrediction = etUserPredict.getText().toString();
 
-        setButtons();
         drawGraph(stockQuote.getStock());
     }
 
@@ -90,12 +90,12 @@ public class StockDetails extends AppCompatActivity {
                 tlStatTable.setVisibility(View.GONE);
                 tvGraphTitle.setVisibility(View.GONE);
                 lineChart.setVisibility(View.GONE);
-                showStatButton.setText("SHOW STATISTICS ");
+                showStatButton.setText("SHOW STATISTICS");
             } else {
-                tvStatTitle.setVisibility(View.GONE);
-                tlStatTable.setVisibility(View.GONE);
-                tvGraphTitle.setVisibility(View.GONE);
-                lineChart.setVisibility(View.GONE);
+                tvStatTitle.setVisibility(View.VISIBLE);
+                tlStatTable.setVisibility(View.VISIBLE);
+                tvGraphTitle.setVisibility(View.VISIBLE);
+                lineChart.setVisibility(View.VISIBLE);
                 showStatButton.setText("CLOSE STATISTICS");
 
             }
@@ -107,7 +107,7 @@ public class StockDetails extends AppCompatActivity {
         if (stock.getHistoricalData() == null || stock.getHistoricalData().size() == 0 || lineChart == null) {
             return;
         }
-        lineChart.setVisibility(View.VISIBLE);
+//        lineChart.setVisibility(View.VISIBLE);
 
         int index = stock.getHistoricalData().size() - 1;
         Entry[] entries = new Entry[index + 1];
