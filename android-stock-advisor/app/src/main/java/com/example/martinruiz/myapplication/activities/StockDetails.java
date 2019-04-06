@@ -22,6 +22,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IFillFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import java.util.ArrayList;
@@ -50,8 +51,6 @@ public class StockDetails extends AppCompatActivity {
     private List<Float> userData;
     private List<Float> MLData;
     private List<Float> realData;
-    private PredictionData appData;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +83,7 @@ public class StockDetails extends AppCompatActivity {
                 adviceShown = !adviceShown;
             }
         });
+        drawGraph(stockQuote.getStock());
     }
 
     private void drawGraph(Stock stock) {
@@ -120,10 +120,12 @@ public class StockDetails extends AppCompatActivity {
 
         lineChart.getAxisRight().setEnabled(false);
 
-        lineChart.getXAxis().setValueFormatter((value, axis) -> {
-            return xAxisValueToTextMap.get((int) value);
+        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return xAxisValueToTextMap.get((int) value);
+            }
         });
-
 
         lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         lineDataSet.setCubicIntensity(0.2f);

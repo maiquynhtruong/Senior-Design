@@ -295,6 +295,9 @@ public class MainActivityStock extends AppCompatActivity {
                     StockApiResponse stockApiResponse = response.body();
                     Log.e("GetHistoricalData", new Gson().toJson(response.body()));
 
+                    String lastRefreshedString = stockApiResponse.getMetaData()._3LastRefreshed.split("\\s+")[0];
+                    stock.setLastUpdatedDate(lastRefreshedString);
+
                     HashMap<String, Float> stockDatePriceMap = new HashMap<>();
                     for (String key : stockApiResponse.getTimeSeries15min().keySet())
                         stockDatePriceMap.put(key, stockApiResponse.getTimeSeries15min().get(key).getClose());
