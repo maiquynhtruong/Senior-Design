@@ -139,7 +139,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:stretchColumns="1"
-            android:visibility="gone">
+            android:visibility="visible">
             <TableRow>
                 <TextView android:background="@color/google_yellow"
                     android:textSize="@dimen/title_size"
@@ -187,6 +187,26 @@
                     android:background="@color/cardview_shadow_start_color"
                     android:layout_margin="3dp"/>
                 <TextView android:text="2"
+                    android:gravity="center"
+                    android:textSize="@dimen/title_size"
+                    android:background="@color/cardview_shadow_start_color" android:layout_margin="3dp"/>
+            </TableRow>
+
+            <TableRow>
+                <TextView android:text="Score."
+                    android:textStyle="bold"
+                    android:textSize="@dimen/title_size"
+                    android:gravity="center"
+                    android:background="@color/google_yellow"
+                    android:layout_margin="3dp"/>
+                <TextView android:text="1"
+                    android:id="@+id/scoreUser"
+                    android:gravity="center"
+                    android:textSize="@dimen/title_size"
+                    android:background="@color/cardview_shadow_start_color"
+                    android:layout_margin="3dp"/>
+                <TextView android:text="2"
+                    android:id="@+id/scoreML"
                     android:gravity="center"
                     android:textSize="@dimen/title_size"
                     android:background="@color/cardview_shadow_start_color" android:layout_margin="3dp"/>
