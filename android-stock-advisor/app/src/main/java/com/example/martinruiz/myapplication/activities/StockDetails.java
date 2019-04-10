@@ -103,18 +103,22 @@ public class StockDetails extends AppCompatActivity {
         return entries2;
     }
 
-    private int calculateScore(Entry[] entries, Entry[] prediction) {
+    private int calculateScore(Entry[] prices, Entry[] prediction) {
         int score = 0;
-        for (int i = 1; i < entries.length; i++) {
-            if (entries[i].getX() > entries[i - 1].getX() && prediction[i].getX() > prediction[i - 1].getX()) {
+        for (int i = 1; i < prices.length; i++) {
+            if (prices[i].getX() > prices[i - 1].getX() && prediction[i].getX() > prediction[i - 1].getX()) {
                 score++;
-            } else if (entries[i].getX() < entries[i - 1].getX() && prediction[i].getX() < prediction[i - 1].getX()) {
+            } else if (prices[i].getX() < prices[i - 1].getX() && prediction[i].getX() < prediction[i - 1].getX()) {
                 score++;
             } else {
                 score--;
             }
         }
         return score;
+    }
+
+    private int calculateCoefficient(Entry[] prices, Entry[] prediction) {
+        int
     }
 
     private void setButtons() {
