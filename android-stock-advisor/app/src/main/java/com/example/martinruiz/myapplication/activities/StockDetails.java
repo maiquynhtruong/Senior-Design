@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -117,8 +116,33 @@ public class StockDetails extends AppCompatActivity {
         return score;
     }
 
-    private int calculateCoefficient(Entry[] prices, Entry[] prediction) {
-        int
+    private float calculateCoefficient(Entry[] X, Entry[] Y) {
+        float corr = 0;
+        int n = X.length;
+        float sum_X = 0, sum_Y = 0, sum_XY = 0;
+        float squareSum_X = 0, squareSum_Y = 0;
+        for (int i = 0; i < n; i++) {
+            sum_X = sum_X + X[i].getX();
+            sum_Y = sum_Y + Y[i].getX();
+            sum_XY = sum_XY + X[i].getX() * Y[i].getX();
+            squareSum_X = squareSum_X + X[i].getX() * X[i].getX();
+            squareSum_Y = squareSum_Y + Y[i].getX() * Y[i].getX();
+        }
+        corr = (float)(n * sum_XY - sum_X * sum_Y)/ (float)(Math.sqrt((n * squareSum_X - sum_X * sum_X) * (n * squareSum_Y - sum_Y * sum_Y)));
+        return corr;
+    }
+
+    private float calculateMSE(Entry[] X, Entry[] Y) {
+        float sum_sq = 0;
+        float mse;
+        for (int i = 0; i < X.length; i++) {
+            float p1 = X[i].getX();
+            float p2 = Y[i].getX();
+            float error = p1 - p2;
+            sum_sq += (error * error);
+        }
+        mse = sum_sq / (X.length * X.length);
+        return mse;
     }
 
     private void setButtons() {
