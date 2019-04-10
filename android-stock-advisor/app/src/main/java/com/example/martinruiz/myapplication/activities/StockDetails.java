@@ -23,6 +23,8 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -103,9 +105,11 @@ public class StockDetails extends AppCompatActivity {
         });
     }
 
-    private List<Float> getUserPredction (Stock stock) {
-        List<Float> hsdta = stock.getHistoricalData();
-        return stockQuote.createRandomList(hsdata);
+    private float getRandomElement (float f) {
+        int flag = 1;
+        Random random = new Random();
+        if (random.nextBoolean())  flag = 2;
+        return f + (float)Math.random() * 20 * (float)Math.pow(-1, flag);
     }
 
     private void drawGraph(Stock stock) {
@@ -116,12 +120,14 @@ public class StockDetails extends AppCompatActivity {
 
         int index = stock.getHistoricalData().size() - 1;
         Entry[] entries = new Entry[index + 1];
+        Entry[] entries2 = new Entry[index + 1]; //user random prediction
         HashMap<Integer, String> xAxisValueToTextMap = new HashMap<>();
 
         String key = stock.getLastUpdatedDate();
         while (index >= 0) {
             if (stock.getHistoricalData().containsKey(key)) {
                 entries[index] = new Entry(index, stock.getHistoricalData().get(key));
+                entries2[index] = new Entry(index, getRandomElement(stock.getHistoricalData().get(key)));
                 xAxisValueToTextMap.put(index, key);
                 index--;
             }
@@ -139,7 +145,7 @@ public class StockDetails extends AppCompatActivity {
 
 
         LineDataSet lineDataSet = new LineDataSet(Arrays.asList(entries), "Stock price");
-
+        LineDataSet lineDataSet2 = new LineDataSet(Arrays.asList(entries2), "user prediction");
         lineChart.getAxisRight().setEnabled(false);
 
         lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
@@ -162,8 +168,22 @@ public class StockDetails extends AppCompatActivity {
         lineDataSet.setDrawHorizontalHighlightIndicator(false);
         lineDataSet.setFillFormatter((dataSet, dataProvider) -> -10);
 
+        lineDataSet2.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        lineDataSet2.setCubicIntensity(0.2f);
+        lineDataSet2.setDrawCircles(false);
+        lineDataSet2.setLineWidth(1.8f);
+        lineDataSet2.setCircleRadius(4f);
+        lineDataSet2.setCircleColor(Color.WHITE);
+        lineDataSet2.setHighLightColor(Color.rgb(244, 117, 117));
+        lineDataSet2.setColor(Color.WHITE);
+        lineDataSet2.setFillColor(Color.WHITE);
+        lineDataSet2.setFillAlpha(100);
+        lineDataSet2.setDrawHorizontalHighlightIndicator(false);
+        lineDataSet2.setFillFormatter((dataSet, dataProvider) -> -10);
+
         // create a data object with the datasets
         LineData data = new LineData(lineDataSet);
+        data.addDataSet(lineDataSet2);
         data.setValueTextSize(9f);
         data.setDrawValues(false);
 
@@ -174,8 +194,10 @@ public class StockDetails extends AppCompatActivity {
         lineChart.setVisibleXRangeMaximum(10);
         lineChart.moveViewToX(100);
         lineChart.setScaleX(1);
-        lineDataSet.setColor(Color.rgb(244,125,66));
+        lineDataSet.setColor(Color.rgb(0,0,66));
         lineDataSet.setFillColor(Color.rgb(244,125,66));
+        lineDataSet2.setColor(Color.rgb(128,0,0));
+        lineDataSet2.setFillColor(Color.rgb(128,0,0));
 
     }
 }
