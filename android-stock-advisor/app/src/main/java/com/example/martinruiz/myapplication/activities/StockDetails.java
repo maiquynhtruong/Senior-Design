@@ -3,6 +3,7 @@ package com.example.martinruiz.myapplication.activities;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,7 +24,6 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,13 +42,19 @@ public class StockDetails extends AppCompatActivity {
     @BindView(R.id.stat_table) TableLayout tlStatTable;
     @BindView(R.id.graph_title) TextView tvGraphTitle;
     @BindView(R.id.prediction_chart) LineChart lineChart;
+    @BindView(R.id.scoreUser) TextView tvScoreUser;
+    @BindView(R.id.scoreML) TextView tvScoreML;
+    @BindView(R.id.MLCorr) TextView tvMLCorr;
+    @BindView(R.id.MLMSE) TextView tvMLMse;
+    @BindView(R.id.userCorr) TextView tvUserCorr;
+    @BindView(R.id.userMse) TextView tvUserMSE;
 
+    Stock stock;
     Entry[] entries; // stock price
     Entry[] entries2; //user random prediction
     Entry[] entries3; //machine leanring random prediction
 
     private StockQuote stockQuote;
-    Stock stock;
     static boolean adviceShown = false;
     static boolean statShown = false;
 
@@ -73,25 +79,40 @@ public class StockDetails extends AppCompatActivity {
         tvStockPrice.setText(String.format("USD %s", stockQuote.getStock().getPrice()));
         String userPrediction = etUserPredict.getText().toString();
         stock = stockQuote.getStock();
-        this.entries2 = initializeRandomList(stock, this.entries2); //set user prediction with random data
-        this.entries3 = initializeRandomList(stock, this.entries3); // //set ML prediction with random data
+        this.entries = new Entry[stock.getHistoricalData().size()];
+        this.entries2 = new Entry[stock.getHistoricalData().size()];
+        this.entries3 = new Entry[stock.getHistoricalData().size()];
+        initializeRandomList(stock, this.entries2); //set user prediction with random data
+        initializeRandomList(stock, this.entries3); // //set ML prediction with random data
 
-        calculateScore(entries, entries2);
+
         drawGraph(stock);
+        tvScoreUser.setText(""+calculateScore(this.entries, this.entries2));
+        tvUserCorr.setText(""+ calculateCorrelation(this.entries, this.entries2));
+        tvUserMSE.setText(""+calculateMSE(this.entries, this.entries2));
+        tvScoreML.setText(""+calculateScore(this.entries, this.entries3));
+        tvMLCorr.setText(""+ calculateCorrelation(this.entries, this.entries3));
+        tvMLMse.setText(""+calculateMSE(this.entries, this.entries3));
+
     }
 
-    private Entry[] initializeRandomList(Stock stock, Entry[] entries2) {
+    private void initializePriceList() {
         if (stock.getHistoricalData() == null || stock.getHistoricalData().size() == 0) {
-            return null;
+            return;
         }
         int index = stock.getHistoricalData().size() - 1;
-        this.entries = new Entry[index + 1];
-        entries2 = new Entry[index + 1];
+    }
+
+    private void initializeRandomList(Stock stock, Entry[] prediction) {
+        if (stock.getHistoricalData() == null || stock.getHistoricalData().size() == 0) {
+            return;
+        }
+        int index = stock.getHistoricalData().size() - 1;
         String key = stock.getLastUpdatedDate();
         while (index >= 0) {
             if (stock.getHistoricalData().containsKey(key)) {
-                entries[index] = new Entry(index, stock.getHistoricalData().get(key));
-                entries2[index] = new Entry(index, getRandomElement(stock.getHistoricalData().get(key)));
+                this.entries[index] = new Entry(index, stock.getHistoricalData().get(key));
+                prediction[index] = new Entry(index, getRandomElement(stock.getHistoricalData().get(key)));
                 index--;
             }
 
@@ -99,15 +120,14 @@ public class StockDetails extends AppCompatActivity {
             date.setTime(date.getTime() - 2);
             key = DateUtils.convertDateToString(date);
         }
-        return entries2;
     }
 
     private int calculateScore(Entry[] prices, Entry[] prediction) {
         int score = 0;
         for (int i = 1; i < prices.length; i++) {
-            if (prices[i].getX() > prices[i - 1].getX() && prediction[i].getX() > prediction[i - 1].getX()) {
+            if (prices[i].getY() > prices[i - 1].getY() && prediction[i].getY() > prediction[i - 1].getY()) {
                 score++;
-            } else if (prices[i].getX() < prices[i - 1].getX() && prediction[i].getX() < prediction[i - 1].getX()) {
+            } else if (prices[i].getY() < prices[i - 1].getY() && prediction[i].getY() < prediction[i - 1].getY()) {
                 score++;
             } else {
                 score--;
@@ -116,19 +136,21 @@ public class StockDetails extends AppCompatActivity {
         return score;
     }
 
-    private float calculateCoefficient(Entry[] X, Entry[] Y) {
+    private float calculateCorrelation(Entry[] X, Entry[] Y) {
         float corr = 0;
         int n = X.length;
         float sum_X = 0, sum_Y = 0, sum_XY = 0;
         float squareSum_X = 0, squareSum_Y = 0;
         for (int i = 0; i < n; i++) {
-            sum_X = sum_X + X[i].getX();
-            sum_Y = sum_Y + Y[i].getX();
-            sum_XY = sum_XY + X[i].getX() * Y[i].getX();
-            squareSum_X = squareSum_X + X[i].getX() * X[i].getX();
-            squareSum_Y = squareSum_Y + Y[i].getX() * Y[i].getX();
+            sum_X = sum_X + X[i].getY();
+            sum_Y = sum_Y + Y[i].getY();
+            sum_XY = sum_XY + X[i].getY() * Y[i].getY();
+            squareSum_X = squareSum_X + X[i].getY() * X[i].getY();
+            squareSum_Y = squareSum_Y + Y[i].getY() * Y[i].getY();
         }
-        corr = (float)(n * sum_XY - sum_X * sum_Y)/ (float)(Math.sqrt((n * squareSum_X - sum_X * sum_X) * (n * squareSum_Y - sum_Y * sum_Y)));
+        corr = (n * sum_XY - sum_X * sum_Y) / (float)(Math.sqrt((n * squareSum_X - sum_X * sum_X) * (n * squareSum_Y - sum_Y * sum_Y)));
+        System.out.println("sum_X:" + sum_X + ", sum_Y:" + sum_Y + ", sum_XY: " + sum_XY + ", squareSum_X: " + squareSum_X + ", squareSum_Y: " + squareSum_Y);
+        Log.e("corr", String.format("%6f", corr));
         return corr;
     }
 
@@ -136,8 +158,8 @@ public class StockDetails extends AppCompatActivity {
         float sum_sq = 0;
         float mse;
         for (int i = 0; i < X.length; i++) {
-            float p1 = X[i].getX();
-            float p2 = Y[i].getX();
+            float p1 = X[i].getY();
+            float p2 = Y[i].getY();
             float error = p1 - p2;
             sum_sq += (error * error);
         }
@@ -210,11 +232,9 @@ public class StockDetails extends AppCompatActivity {
         Description description = new Description();
         description.setText("Stock price history");
         lineChart.setDescription(description);
-
-
-        LineDataSet lineDataSet = new LineDataSet(Arrays.asList(entries), "Stock price");
-        LineDataSet lineDataSet2 = new LineDataSet(Arrays.asList(entries2), "user prediction");
-        LineDataSet lineDataSet3 = new LineDataSet(Arrays.asList(entries3), "ML prediction");
+        LineDataSet lineDataSet = new LineDataSet(Arrays.asList(this.entries), "Stock price");
+        LineDataSet lineDataSet2 = new LineDataSet(Arrays.asList(this.entries2), "user prediction");
+        LineDataSet lineDataSet3 = new LineDataSet(Arrays.asList(this.entries3), "ML prediction");
         lineChart.getAxisRight().setEnabled(false);
 
         lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
