@@ -204,7 +204,7 @@ public class StockDetails extends AppCompatActivity {
         int flag = 1;
         Random random = new Random();
         if (random.nextBoolean())  flag = 2;
-        return f + (float)Math.random() * 20 * (float)Math.pow(-1, flag);
+        return f + f * (float)Math.random()* (float)0.01 * (float)Math.pow(-1, flag);
     }
 
     private void drawGraph(Stock stock) {
