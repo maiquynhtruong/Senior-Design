@@ -12,4 +12,6 @@
     <string name="add_first_stock">Add your first stock</string>
     <string name="stock_updates">"Tap the add button and add your favorites stocks to get price and trend updates"</string>
     <string name="error_gcp">There was an error getting trend prediction. Please try again </string>
+    <string name="add_prediction">Added prediction to prediction list</string>
+    <string name="pred_empty">Unable to add because price is empty</string>
 </resources>

@@ -139,7 +139,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:stretchColumns="1"
-            android:visibility="visible">
+            android:visibility="gone">
             <TableRow>
                 <TextView android:background="@color/google_yellow"
                     android:textSize="@dimen/title_size"

@@ -2,6 +2,7 @@ package com.example.martinruiz.myapplication.activities;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +21,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -43,10 +45,11 @@ public class StockDetails extends AppCompatActivity {
     @BindView(R.id.stat_table) TableLayout tlStatTable;
     @BindView(R.id.graph_title) TextView tvGraphTitle;
     @BindView(R.id.prediction_chart) LineChart lineChart;
+    @BindView(R.id.submit_btn) Button submitBtn;
 
-    Entry[] entries; // stock price
-    Entry[] entries2; //user random prediction
-    Entry[] entries3; //machine leanring random prediction
+    Entry[] actual; // stock price
+    Entry[] user; //user random prediction
+    Entry[] ml; //machine leanring random prediction
 
     private StockQuote stockQuote;
     Stock stock;
@@ -72,27 +75,26 @@ public class StockDetails extends AppCompatActivity {
         tvTickerSymbol.setText(stockQuote.getStock().getSymbol());
         tvStockName.setText(stockQuote.getStock().getName());
         tvStockPrice.setText(String.format("USD %s", stockQuote.getStock().getPrice()));
-        String userPrediction = etUserPredict.getText().toString();
         stock = stockQuote.getStock();
-        this.entries2 = initializeRandomList(stock, this.entries2); //set user prediction with random data
-        this.entries3 = initializeRandomList(stock, this.entries3); // //set ML prediction with random data
+        this.user = initializeRandomList(stock); //set user prediction with random data
+        this.ml = initializeRandomList(stock); // //set ML prediction with random data
 
-        calculateScore(entries, entries2);
+        calculateScore(actual, user);
         drawGraph(stock);
     }
 
-    private Entry[] initializeRandomList(Stock stock, Entry[] entries2) {
+    private Entry[] initializeRandomList(Stock stock) {
         if (stock.getHistoricalData() == null || stock.getHistoricalData().size() == 0) {
             return null;
         }
         int index = stock.getHistoricalData().size() - 1;
-        this.entries = new Entry[index + 1];
-        entries2 = new Entry[index + 1];
+        this.actual = new Entry[index + 1];
+        Entry[] entries = new Entry[index + 1];
         String key = stock.getLastUpdatedDate();
         while (index >= 0) {
             if (stock.getHistoricalData().containsKey(key)) {
-                entries[index] = new Entry(index, stock.getHistoricalData().get(key));
-                entries2[index] = new Entry(index, getRandomElement(stock.getHistoricalData().get(key)));
+                actual[index] = new Entry(index, stock.getHistoricalData().get(key));
+                entries[index] = new Entry(index, getRandomElement(stock.getHistoricalData().get(key)));
                 index--;
             }
 
@@ -100,7 +102,15 @@ public class StockDetails extends AppCompatActivity {
             date.setTime(date.getTime() - 2);
             key = DateUtils.convertDateToString(date);
         }
-        return entries2;
+        return entries;
+    }
+
+    private void addToList(float pred, Entry[] entries) {
+        int length = entries.length;
+        for (int i = 0; i < length-1; i++) {
+            entries[i] = entries[i+1];
+        }
+        entries[length-1] = new Entry(length-1, pred);
     }
 
     private int calculateScore(Entry[] prices, Entry[] prediction) {
@@ -117,11 +127,19 @@ public class StockDetails extends AppCompatActivity {
         return score;
     }
 
-    private int calculateCoefficient(Entry[] prices, Entry[] prediction) {
-        int
-    }
-
     private void setButtons() {
+
+        submitBtn.setOnClickListener(v -> {
+            String userPrediction = etUserPredict.getText().toString();
+            if (userPrediction.isEmpty()) {
+                Snackbar.make(v, R.string.pred_empty, Snackbar.LENGTH_LONG).show();
+            } else {
+                Snackbar.make(v, R.string.add_prediction, Snackbar.LENGTH_LONG).show();
+
+                addToList(Float.valueOf(userPrediction), user);
+            }
+        });
+
         showAdviceButton.setOnClickListener(v -> {
             if (adviceShown) {
                 appPrediction.setVisibility(View.GONE);
@@ -188,9 +206,9 @@ public class StockDetails extends AppCompatActivity {
         lineChart.setDescription(description);
 
 
-        LineDataSet lineDataSet = new LineDataSet(Arrays.asList(entries), "Stock price");
-        LineDataSet lineDataSet2 = new LineDataSet(Arrays.asList(entries2), "user prediction");
-        LineDataSet lineDataSet3 = new LineDataSet(Arrays.asList(entries3), "ML prediction");
+        LineDataSet lineDataSet = new LineDataSet(Arrays.asList(actual), "Stock price");
+        LineDataSet lineDataSet2 = new LineDataSet(Arrays.asList(user), "user prediction");
+        LineDataSet lineDataSet3 = new LineDataSet(Arrays.asList(ml), "ML prediction");
         lineChart.getAxisRight().setEnabled(false);
 
         lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
