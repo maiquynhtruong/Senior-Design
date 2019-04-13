@@ -82,7 +82,6 @@ public class StockDetails extends AppCompatActivity {
         tvTickerSymbol.setText(stockQuote.getStock().getSymbol());
         tvStockName.setText(stockQuote.getStock().getName());
         tvStockPrice.setText(String.format("USD %s", stockQuote.getStock().getPrice()));
-        String userPrediction = etUserPredict.getText().toString();
         stock = stockQuote.getStock();
         this.entries = new Entry[stock.getHistoricalData().size()];
         this.entries2 = new Entry[stock.getHistoricalData().size()];
