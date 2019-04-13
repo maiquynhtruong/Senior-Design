@@ -16,10 +16,13 @@ import com.example.martinruiz.myapplication.models.StockQuote;
 import com.example.martinruiz.myapplication.utils.DateUtils;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.LegendEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -229,13 +232,22 @@ public class StockDetails extends AppCompatActivity {
         }
 
 
-        Description description = new Description();
-        description.setText("Stock price history");
-        lineChart.setDescription(description);
-        LineDataSet lineDataSet = new LineDataSet(Arrays.asList(this.entries), "Stock price");
-        LineDataSet lineDataSet2 = new LineDataSet(Arrays.asList(this.entries2), "user prediction");
-        LineDataSet lineDataSet3 = new LineDataSet(Arrays.asList(this.entries3), "ML prediction");
-        lineChart.getAxisRight().setEnabled(false);
+        lineChart.getDescription().setEnabled(false);
+        LineDataSet lineDataSet = new LineDataSet(Arrays.asList(this.entries), "Stock Price");
+        LineDataSet lineDataSet2 = new LineDataSet(Arrays.asList(this.entries2), "User Prediction");
+        LineDataSet lineDataSet3 = new LineDataSet(Arrays.asList(this.entries3), "ML Prediction");
+        lineChart.getAxisRight().setEnabled(true);
+        lineChart.setTouchEnabled(true);
+
+        Legend l = lineChart.getLegend();
+        LegendEntry[] labs = new LegendEntry[3];
+        labs[0] = new LegendEntry("Stock Price", Legend.LegendForm.LINE, 30, 3, null, (Color.rgb(0,0,66)));
+        labs[1] = new LegendEntry("ML Prediction", Legend.LegendForm.LINE, 30, 3, null, Color.rgb(128,0,0));
+        labs[2] = new LegendEntry("User Prediction", Legend.LegendForm.LINE, 30, 3, null, Color.rgb(0,100,0));
+        l.setEnabled(true);
+        l.setCustom(labs);
+        l.setTextSize(15);
+        l.setDirection(Legend.LegendDirection.LEFT_TO_RIGHT);
 
         lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
             @Override
@@ -256,6 +268,7 @@ public class StockDetails extends AppCompatActivity {
         lineDataSet.setFillAlpha(100);
         lineDataSet.setDrawHorizontalHighlightIndicator(false);
         lineDataSet.setFillFormatter((dataSet, dataProvider) -> -10);
+        lineDataSet.setValueTextSize(80);
 
         lineDataSet2.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         lineDataSet2.setCubicIntensity(0.2f);
