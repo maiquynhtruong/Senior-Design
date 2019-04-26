@@ -45,7 +45,15 @@ Once in a while, you can check your progress by tapping on an individual stock t
 - Using the app in another language
   - To change the language, go to `Settings` and select a language in `Languages` tab. 
   - Currently, we support this app in English, Chinese, Vietnamese and Japanese. To request support for another language, please send a request to the emails below.
-- Found a bug? Submit it to [bugs@stockadvisor.io](https://github.com/maiquynhtruong/Senior-Design)
+- Progress metrics
+  - To learn more about how we measure user's progress, read our blog post on [Medium](https://github.com/maiquynhtruong/Senior-Design)
+- Open source contribution
+  - To contribute to this open source project, please view the [contributing guide](https://github.com/maiquynhtruong/Senior-Design) before making contributions. Thanks!
+- User data privacy
+  - We dont' sell your data
+  - User data is stored on secure Google cloud server
+  - We follow DPCAA complicance. Read more about it [here](https://github.com/maiquynhtruong/Senior-Design)
+- Found a bug? Submit it to [bugs@stockadvisor.io](https://github.com/maiquynhtruong/Senior-Design)!
 - More questions? We're happy help! Shoot us an email at
   - [truongmi@mail.uc.edu](https://github.com/maiquynhtruong/Senior-Design)
   - [changy6@mail.uc.edu](https://github.com/maiquynhtruong/Senior-Design)
