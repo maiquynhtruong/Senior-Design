@@ -39,7 +39,13 @@ Once in a while, you can check your progress by tapping on an individual stock t
 
 
 ## FAQ
-- [APK install options & other mobile platforms](https://github.com/maiquynhtruong/Senior-Design)
-- [Download app in another language](https://github.com/maiquynhtruong/Senior-Design)
-- [Found a bug? Submit it here!](https://github.com/maiquynhtruong/Senior-Design)
-- [Need help?](https://github.com/maiquynhtruong/Senior-Design)
+- APK install options & other mobile platforms
+  - Download the APK file [here]((https://github.com/maiquynhtruong/Senior-Design)) to install directly on your device.
+  - We unfortunately were only able to develop this app on Android and iOS platform. However, if the app has great feedback, we will consider other platform and even a desktop version!
+- Using the app in another language
+  - To change the language, go to `Settings` and select a language in `Languages` tab. 
+  - Currently, we support this app in English, Chinese, Vietnamese and Japanese. To request support for another language, please send a request to the emails below.
+- Found a bug? Submit it to [bugs@stockadvisor.io](https://github.com/maiquynhtruong/Senior-Design)
+- More questions? We're happy help! Shoot us an email at
+  - [truongmi@mail.uc.edu](https://github.com/maiquynhtruong/Senior-Design)
+  - [changy6@mail.uc.edu](https://github.com/maiquynhtruong/Senior-Design)
