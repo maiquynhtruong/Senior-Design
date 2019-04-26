@@ -32,11 +32,14 @@ To add even more stocks, simply click on the plus button and provide the ticker 
 <img width="200" height="400" src="https://user-images.githubusercontent.com/20506541/55293537-80700b00-53c5-11e9-863b-7f5f95773d7a.png">
 
 ## Make trading decisions and getting predictions
-Daily, you can click on stock ticker symbol to open up the menu to add your predicted price for that stock. Submit your insight by tapping the "submit" button. After that, you can view the Machine Learning model's prediction for that same stock. 
+Daily, you can click on stock ticker symbol to open up the menu to add your predicted price for that stock. Submit your insight by tapping the "submit" button. After that, you can view the Machine Learning model's prediction for that same stock by clicking.
+
+<img width="200" height="400" src="https://user-images.githubusercontent.com/10360577/56837378-2ccbd280-6848-11e9-921c-25f7eb90a07b.png">
 
 ## Checking your progress
 Once in a while, you can check your progress by tapping on an individual stock to open a new window. Scroll to the bottom to view charts, metrics and scores. The data is saved from some period of usage, the longer you use the app, the more accurate it becomes.
 
+<img width="200" height="400" src="https://user-images.githubusercontent.com/10360577/56837323-fee68e00-6847-11e9-98d3-4e0977b208cd.png">
 
 ## FAQ
 - APK install options & other mobile platforms
