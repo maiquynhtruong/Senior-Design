@@ -23,10 +23,10 @@ After you add a new stock on the app. The app shows the list of stocks you added
 <img width="200" height="400" src="https://user-images.githubusercontent.com/20506541/55293537-80700b00-53c5-11e9-863b-7f5f95773d7a.png">
 
 ## Checking the progress
-Once in a while, you can check your progress.
+Once in a while, you can check your progress by tapping on an individual stock and scroll to the end.
 
 ## FAQ
-- [Advanced install options & other platforms] (https://github.com/maiquynhtruong/Senior-Design)
-- [Download in another language] (https://github.com/maiquynhtruong/Senior-Design)
-- [Fix a problem] (https://github.com/maiquynhtruong/Senior-Design)
-- [Need help?] (https://github.com/maiquynhtruong/Senior-Design)
+- [Advanced install options & other platforms](https://github.com/maiquynhtruong/Senior-Design)
+- [Download in another language](https://github.com/maiquynhtruong/Senior-Design)
+- [Fix a problem](https://github.com/maiquynhtruong/Senior-Design)
+- [Need help?](https://github.com/maiquynhtruong/Senior-Design)
